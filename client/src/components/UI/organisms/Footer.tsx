@@ -5,14 +5,17 @@ const StyledFooter = styled.footer`
     background-color: #87085D;
 
     display: flex;
-    justify-content: center;
+    justify-content: space-between;
     align-items: center;
+
+    padding-left: 20px;
+    padding-right: 20px;
 
     gap: 20px;
 
     >a{
-        margin: 0 15px;
         color: white;
+        text-align: center;
 
         &:hover {
         text-decoration: underline;
@@ -21,12 +24,13 @@ const StyledFooter = styled.footer`
 
     >p{
         color: white;
+        text-align: center;
         }
 `
 const Footer = () => {
     return (
         <StyledFooter>
-            <p>&copy; 2025 Final Project. TYPE26. All rights reserved.</p>
+            <p>&copy; TYPE26 Final Project.</p>
             <a href="/privacy-policy">Privacy Policy</a>
             <a href="/terms-of-service">Terms of Service</a>
             <a href="/contact">Contact Us</a>
