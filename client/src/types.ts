@@ -9,11 +9,41 @@ export type User = {
     lastName: string,
     dob: string,
     password: string,
+    passwordText: string,
     createDate: string,
-    createdQuestions: Question[],
-    answeredQuestions: Question[],
-    likedQuestions: Question[],
-    dislikedQuestions: Question[]
+    createdQuestions: string[],
+    answeredQuestions: string[],
+    likedQuestions: string[],
+    dislikedQuestions: string[]
+};
+
+export type UsersReducerActionTypes =
+    { type: 'setData', data: User[] } |
+    { type: 'addUser', newUser: User } |
+    { type: 'editUser', updatedUser: Partial<User> & { _id: string } } |
+    { type: 'logUserOut' };
+
+export type UserContextTypes = {
+    users: User[],
+    loggedInUser: Omit<User, 'password' | "passwordText"> | null,
+    logOut: () => void,
+    login: ({ username, password }: Pick<User, "username" | "password">, keepLoggedIn: boolean) => Promise<{ error: string } | { success: string }>,
+    editUser: ({ keyWord, newValue }: {
+        keyWord: keyof Omit<User, "_id" | "username" | "dob" | "createDate" | "createdQuestions" | "answeredQuestions" | "likedQuestions" | "dislikedQuestions">;
+        newValue: string;
+    }) => void,
+    dispatch: React.Dispatch<UsersReducerActionTypes>,
+    setLoggedInUser: React.Dispatch<React.SetStateAction<User | null>>
+};
+
+export type RegisterFormValues = {
+    username: string;
+    email: string;
+    firstName: string;
+    lastName: string;
+    dob: string;
+    password: string;
+    passwordRepeat: string;
 };
 
 export type Question = {
@@ -34,4 +64,4 @@ export type Answer = {
     questionId: Question['_id'],
     answerText: string,
     createDate: string
-}
+};
