@@ -226,7 +226,6 @@ const Register = () => {
                 error && <p>{error}</p>
             }
             <Link to="/login">Aleady have an account? Go login.</Link>
-            <Link to="/" className='homeLink'>Home</Link>
         </StyledReg>
     );
 }
