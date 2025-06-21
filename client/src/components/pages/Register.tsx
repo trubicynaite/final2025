@@ -9,7 +9,100 @@ import UsersContext from "../../contexts/UsersContext";
 import { User, UserContextTypes } from "../../types";
 
 const StyledReg = styled.section`
-    
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  > h2 {
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+  }
+
+  >form{
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    color: white;
+
+    >div{
+        display: flex;
+        flex-direction: column;
+
+      >label{
+        margin-bottom: 5px;
+        color: #f3aadb;
+      }
+
+      >input {
+        color: white;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+
+        &::placeholder {
+          color: #f3aadb99;
+        }
+
+        &:focus {
+            color: #f3aadb;
+        }
+      }
+
+      >p{
+        margin-top: 5px;
+        font-size: 15px;
+        color: #f3aadb
+      }
+    }
+
+    input[type="submit"] {
+      background-color: #f3aadb;
+      color: #87085D;
+      padding: 10px 0;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+
+      &:hover {
+        background-color: #EB88CA;
+        color: white;
+      }
+    }
+  }
+
+  > a {
+    margin-top: 15px;
+    color: #f3aadb;
+    font-size: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: white;
+    }
+  }
+
+  @media (min-width: 575px) {
+    padding: 40px;
+
+    >form {
+      max-width: 400px;
+
+      input {
+        font-size: 17px;
+      }
+    }
+
+    >h2 {
+      font-size: 28px;
+    }
+  }
 `;
 
 const Register = () => {
@@ -47,7 +140,7 @@ const Register = () => {
             dob: Yup.date()
                 .min(new Date(1900), 'Date must be later than 1900.')
                 .max(new Date(new Date().setFullYear(new Date().getFullYear() - 14)), 'You must be at least 14 years old.')
-                .required(),
+                .required('Field cannot be empty.'),
             password: Yup.string()
                 .matches(
                     /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,20}$/,
