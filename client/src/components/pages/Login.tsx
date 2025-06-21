@@ -9,7 +9,145 @@ import UsersContext from "../../contexts/UsersContext";
 import { UserContextTypes } from "../../types";
 
 const StyledLogin = styled.section`
-    
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+
+  > h2 {
+    text-align: center;
+    color: white;
+    margin-bottom: 20px;
+  }
+
+  > form {
+    display: grid;
+    gap: 10px;
+    width: 100%;
+    max-width: 320px;
+    color: white;
+
+    > div {
+      display: flex;
+      flex-direction: column;
+
+      > label {
+        margin-bottom: 5px;
+        color: #f3aadb;
+        cursor: pointer;
+      }
+
+      > input[type="text"],
+      input[type="password"] {
+        color: white;
+        padding: 8px 10px;
+        border: none;
+        border-radius: 5px;
+        font-size: 16px;
+        background-color: transparent;
+        border: 1.5px solid #EB88CA;
+        transition: border-color 0.3s ease;
+
+        &::placeholder {
+          color: #f3aadb99;
+        }
+
+        &:focus {
+          border-color: #f3aadb;
+          outline: none;
+          color: #f3aadb;
+        }
+      }
+
+      > p {
+        margin-top: 5px;
+        font-size: 15px;
+        color: #f3aadb;
+      }
+    }
+
+    > div.checkbox {
+      flex-direction: row;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+
+      > input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+        margin: 0;
+      }
+
+      > label.loggedIn {
+        color: #f3aadb;
+        font-size: 14px;
+        cursor: pointer;
+        user-select: none;
+        margin: 0;
+      }
+    }
+
+    input[type="submit"] {
+      background-color: #f3aadb;
+      color: #87085D;
+      padding: 10px 0;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-size: 18px;
+      transition: background-color 0.3s ease, color 0.3s ease;
+
+      &:hover {
+        background-color: #EB88CA;
+        color: white;
+      }
+    }
+  }
+
+  > p {
+    margin-top: 15px;
+    color: #f3aadb;
+    font-size: 16px;
+    text-align: center;
+  }
+
+  > a {
+    margin-top: 15px;
+    color: #f3aadb;
+    font-size: 15px;
+    text-decoration: underline;
+    cursor: pointer;
+
+    &:hover {
+      color: white;
+    }
+  }
+
+  @media (min-width: 575px) {
+    padding: 40px;
+
+    > h2 {
+      font-size: 28px;
+    }
+
+    > form {
+      max-width: 400px;
+
+      input[type="text"],
+      input[type="password"] {
+        font-size: 17px;
+      }
+
+      input[type="submit"] {
+        font-size: 20px;
+      }
+
+      > label.loggedIn {
+        font-size: 15px;
+      }
+    }
+  }
 `;
 
 const Login = () => {
@@ -102,7 +240,7 @@ const Login = () => {
                                     <p>{formik.errors.password}</p>
                                 }
                             </div>
-                            <div>
+                            <div className="checkbox">
                                 <input
                                     type="checkbox"
                                     name="stayLoggedIn" id="stayLoggedIn"
