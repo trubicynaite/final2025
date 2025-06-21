@@ -13,13 +13,13 @@ const StyledHeader = styled.header`
     >div.top {
         display: flex;
         align-items: center;
-        gap: 10px;
+        gap: 15px;
         flex-shrink: 0;
 
         >div.logo{
         width: 50px;
         height: 50px;
-        border-radius: 30px;
+        border-radius: 6px;
         background-color: #EB88CA;
         display: flex;
         justify-content: center;
@@ -30,6 +30,7 @@ const StyledHeader = styled.header`
             font-size: 30px;
             color: white;
             margin: 0;
+            user-select: none;
         }
     }
 
@@ -49,7 +50,7 @@ const StyledHeader = styled.header`
 
                 display: flex;
                 justify-content: center;
-                gap: 10px;
+                gap: 5px;
 
                 >li{
                     >a{
@@ -57,14 +58,15 @@ const StyledHeader = styled.header`
                         color: white;
                         font-size: 18px;
                         padding: 8px;
+                        border-radius: 6px;
 
                         &:hover{
                             color: #f3aadb;
                         }
                         &.active{
-                            color: #f3aadb;
+                            background-color: #f3aadb;
+                            color: #87085D;
                             border: 1px solid #f3aadb;
-                            border-radius: 50px;
                         }
                     }
                 }
@@ -109,10 +111,10 @@ const Header = () => {
             </div>
             <nav>
                 <ul>
-                    <li><NavLink to="/" className={({ isActive }) => (isActive ? "active" : undefined)}>Home</NavLink></li>
-                    <li><NavLink to="/questions" className={({ isActive }) => (isActive ? "active" : undefined)}>Questions</NavLink></li>
-                    <li><NavLink to="/login" className={({ isActive }) => (isActive ? "active" : undefined)}>Login</NavLink></li>
-                    <li><NavLink to="/register" className={({ isActive }) => (isActive ? "active" : undefined)}>Register</NavLink></li>
+                    <li><NavLink to="/">Home</NavLink></li>
+                    <li><NavLink to="/questions">Questions</NavLink></li>
+                    <li><NavLink to="/login">Login</NavLink></li>
+                    <li><NavLink to="/register">Register</NavLink></li>
                 </ul>
             </nav>
         </StyledHeader>
