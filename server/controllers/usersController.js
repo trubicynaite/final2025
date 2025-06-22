@@ -92,11 +92,16 @@ export const editUser = async (req, res) => {
         if (!ObjectId.isValid(userId)) {
             return res.status(400).send({ error: "Invalid user ID." });
         }
-        const updates = req.body;
+        const updates = { ...req.body };
 
         delete updates._id;
         delete updates.username;
         delete updates.dob;
+        delete updates.createDate;
+        delete updates.createdQuestions;
+        delete updates.answeredQuestions;
+        delete updates.likedQuestions;
+        delete updates.dislikedQuestions;
 
         if (updates.password) {
             updates.password = bcrypt.hashSync(updates.password, 10);
