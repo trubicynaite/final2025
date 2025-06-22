@@ -3,7 +3,6 @@ import { useNavigate, Link } from "react-router";
 import { useFormik } from "formik";
 import * as Yup from 'yup';
 import styled from "styled-components";
-import bcrypt from "bcryptjs";
 
 import UsersContext from "../../contexts/UsersContext";
 import { UserContextTypes } from "../../types";
@@ -67,6 +66,7 @@ const StyledLogin = styled.section`
     }
 
     > div.checkbox {
+        display: flex;
       flex-direction: row;
       align-items: center;
       justify-content: flex-start;
@@ -152,7 +152,7 @@ const StyledLogin = styled.section`
 
 const Login = () => {
 
-    const { users, setLoggedInUser } = useContext(UsersContext) as UserContextTypes;
+    const { setLoggedInUser } = useContext(UsersContext) as UserContextTypes;
     const [error, setError] = useState('');
     const navigate = useNavigate();
     const [loading, setLoading] = useState(true);
@@ -173,31 +173,48 @@ const Login = () => {
                 .required('Field cannot be empty.')
                 .trim(),
             password: Yup.string()
-                .matches(
-                    /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{7,20}$/,
-                    'Password must contain at least one: lower case character, upper case character, number, special symbol AND must be between 7 and 20 symbols length.'
-                )
-                .required('Field cannot be empty')
-                .trim('Empty spaces are ignored')
+                .required('Field cannot be empty.')
+                .trim()
         }),
-        onSubmit: (values) => {
-            if (users) {
-                const foundUser = users.find(user =>
-                    user.username === values.username &&
-                    bcrypt.compareSync(values.password, user.password)
-                );
-                if (foundUser) {
-                    if (values.stayLoggedIn) {
-                        localStorage.setItem('loggedInUser', JSON.stringify(foundUser));
-                    }
-                    setLoggedInUser(foundUser);
-                    navigate('/');
-                } else {
-                    setError('No such user, wrong username or password')
+        onSubmit: async (values) => {
+            try {
+                const response = await fetch("http://localhost:5500/users/login", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        username: values.username,
+                        password: values.password
+                    })
+                });
+                const data = await response.json();
+
+                if (!response.ok) {
+                    setError("Login failed.");
+                    return;
                 }
+
+                const token = response.headers.get("Authorization");
+
+                if (!token) {
+                    setError("Missing authorization token.");
+                    return;
+                }
+
+                if (values.stayLoggedIn) {
+                    localStorage.setItem("loggedInUser", JSON.stringify(data.userData));
+                    localStorage.setItem("token", token);
+                }
+
+                setLoggedInUser(data.userData);
+                navigate("/");
+            } catch {
+                setError("Something went wrong, please try again later.")
             }
         }
-    })
+    });
+
     return (
         <StyledLogin>
             <h2>Login</h2>
@@ -209,7 +226,7 @@ const Login = () => {
                             <div>
                                 <label
                                     htmlFor="username"
-                                >Email: </label>
+                                >Username: </label>
                                 <input
                                     type="text"
                                     name='username' id='username'
