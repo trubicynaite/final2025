@@ -6,7 +6,7 @@ import bcrypt from 'bcrypt';
 export const login = async (req, res) => {
     const client = await connectDB();
     try {
-        const DB_RESPONSE = await client.db('final').collection('users').findOne({ name: req.body.username });
+        const DB_RESPONSE = await client.db('final').collection('users').findOne({ username: req.body.username });
         if (!DB_RESPONSE) {
             return res.status(404).send({ error: "No user was found with such username or password." });
         }
