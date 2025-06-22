@@ -58,6 +58,28 @@ export type Question = {
     answerCount: number
 };
 
+export type QuestionsReducerActionTypes =
+    { type: 'setData', data: Question[] } |
+    { type: 'addQuestion', newQuestion: Question } |
+    { type: 'editQuestion', updatedQuestion: Partial<Question> & { _id: string } } |
+    { type: 'deleteQuestion', _id: string };
+
+export type QuestionsContextTypes = {
+    questions: Question[];
+    dispatch: React.Dispatch<QuestionsReducerActionTypes>;
+    addQuestion: (newQuestion: Question) => void;
+    editQuestion: (updatedQuestion: Partial<Question> & { _id: string }) => void;
+    deleteQuestion: (_id: string) => void;
+    fetchData: () => void;
+    fetchFiltered: (filters?: {
+        answered?: 'true' | 'false',
+        sortBy?: 'createDate' | 'answerCount',
+        order?: 'asc' | 'desc',
+        category?: string,
+        title?: string
+    }) => Promise<void>;
+};
+
 export type Answer = {
     _id: string,
     creatorId: User['_id'],
