@@ -2,13 +2,13 @@ import jwt from 'jsonwebtoken';
 
 export const createAccessJWT = (newUser) => {
     return jwt.sign(newUser, process.env.JWT_ACCESS_SECRET, {
-        expiresIn: '10s'
+        expiresIn: '1h'
     });
 }
 
 export const createRefreshJWT = (newUser) => {
     return jwt.sign(newUser, process.env.JWT_REFRESH_SECRET, {
-        expiresIn: '1m'
+        expiresIn: '1h'
     });
 }
 

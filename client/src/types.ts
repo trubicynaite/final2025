@@ -49,6 +49,7 @@ export type RegisterFormValues = {
 export type Question = {
     _id: string,
     creatorId: User['_id'],
+    creatorUsername: string,
     createDate: string,
     category: string,
     questionHeader: string,
@@ -56,6 +57,28 @@ export type Question = {
     likeCount: number,
     dislikeCount: number,
     answerCount: number
+};
+
+export type QuestionsReducerActionTypes =
+    { type: 'setData', data: Question[] } |
+    { type: 'addQuestion', newQuestion: Question } |
+    { type: 'editQuestion', updatedQuestion: Partial<Question> & { _id: string } } |
+    { type: 'deleteQuestion', _id: string };
+
+export type QuestionsContextTypes = {
+    questions: Question[];
+    dispatch: React.Dispatch<QuestionsReducerActionTypes>;
+    addQuestion: (newQuestion: Question) => void;
+    editQuestion: (updatedQuestion: Partial<Question> & { _id: string }) => void;
+    deleteQuestion: (_id: string) => void;
+    fetchData: () => void;
+    fetchFiltered: (filters?: {
+        answered?: 'true' | 'false',
+        sortBy?: 'createDate' | 'answerCount',
+        order?: 'asc' | 'desc',
+        category?: string,
+        title?: string
+    }) => Promise<Question[] | undefined>;
 };
 
 export type Answer = {

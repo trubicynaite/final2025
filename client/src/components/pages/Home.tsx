@@ -19,6 +19,7 @@ const StyledHome = styled.section`
 `
 
 const Home = () => {
+
     return (
         <StyledHome>
             <h2>Welcome to Pinkie!</h2>
