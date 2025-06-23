@@ -3,11 +3,13 @@ import cors from 'cors';
 import 'dotenv/config';
 
 import usersRoutes from "./routes/usersRoutes.js"
+import questionsRoutes from './routes/questionsRoutes.js'
 
 const PORT = process.env.PORT || 5501;
 
 const corsOptions = {
-    origin: "http://localhost:5173"
+    origin: "http://localhost:5173",
+    exposedHeaders: ['Authorization']
 };
 
 const app = e();
@@ -24,6 +26,7 @@ app.listen(PORT, () => {
 app.use('/users', usersRoutes);
 
 //QUESTIONS
+app.use('/questions', questionsRoutes);
 
 //ANSWERS
 // error

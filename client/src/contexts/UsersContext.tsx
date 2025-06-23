@@ -111,7 +111,7 @@ const UserProvider = ({ children }: ChildrenElementProp) => {
                         sessionStorage.removeItem('accessJWT');
                         navigate('/login');
                     } else {
-                        setLoggedInUser(data);
+                        setLoggedInUser(data.userData);
                     }
                 })
         }

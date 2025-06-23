@@ -1,5 +1,8 @@
-import { NavLink } from "react-router";
+import { useContext } from "react";
+import { NavLink, useNavigate } from "react-router";
 import styled from "styled-components";
+import UsersContext from "../../../contexts/UsersContext";
+import { UserContextTypes } from "../../../types";
 
 const StyledHeader = styled.header`
     height: 80px;
@@ -70,6 +73,22 @@ const StyledHeader = styled.header`
                         }
                     }
                 }
+                > button {
+                background-color: transparent;
+                border: 1px solid white;
+                color: white;
+                font-size: 16px;
+                padding: 6px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: #f3aadb;
+                    color: #87085D;
+                    border-color: #f3aadb;
+                }
+            }
             }
         }
 
@@ -101,6 +120,15 @@ const StyledHeader = styled.header`
 
 const Header = () => {
 
+    const { loggedInUser, setLoggedInUser } = useContext(UsersContext) as UserContextTypes;
+    const navigate = useNavigate();
+
+    const handleLogout = () => {
+        setLoggedInUser(null);
+        localStorage.removeItem('loggedInUser');
+        navigate('/');
+    };
+
     return (
         <StyledHeader>
             <div className="top">
@@ -109,14 +137,24 @@ const Header = () => {
                 </div>
                 <h2>Pinkie</h2>
             </div>
-            <nav>
-                <ul>
-                    <li><NavLink to="/">Home</NavLink></li>
-                    <li><NavLink to="/questions">Questions</NavLink></li>
-                    <li><NavLink to="/login">Login</NavLink></li>
-                    <li><NavLink to="/register">Register</NavLink></li>
-                </ul>
-            </nav>
+            {loggedInUser ?
+                <nav>
+                    <ul>
+                        <li><NavLink to="/">Home</NavLink></li>
+                        <li><NavLink to="/questions">Questions</NavLink></li>
+                        <li><NavLink to="/myActivity">My Activity</NavLink></li>
+                        <button onClick={handleLogout}>Logout</button>
+                    </ul>
+                </nav> :
+                <nav>
+                    <ul>
+                        <li><NavLink to="/">Home</NavLink></li>
+                        <li><NavLink to="/questions">Questions</NavLink></li>
+                        <li><NavLink to="/login">Login</NavLink></li>
+                        <li><NavLink to="/register">Register</NavLink></li>
+                    </ul>
+                </nav>
+            }
         </StyledHeader>
     );
 }

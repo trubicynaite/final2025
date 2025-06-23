@@ -2,10 +2,17 @@ import jwt from 'jsonwebtoken';
 
 export const verifyJWT = (req, res, next) => {
 
-    const accessToken = authHeader.split(' ')[1];
-    jwt.verify(accessToken, process.env.JWT_ACCESS_SECRET, (err, decoded) => {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).send({ error: 'Authorization header missing.' });
+    }
+
+    const token = authHeader.split(' ')[1];
+
+    jwt.verify(token, process.env.JWT_ACCESS_SECRET, (err, decoded) => {
         if (err) {
-            res.status(401).send({ error: 'Your session has expired. Please log in again.' });
+            res.status(401).send({ error: 'Invalid or expired token.' });
         } else {
             req.userId = decoded.id;
             next();
