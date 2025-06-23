@@ -1,6 +1,7 @@
 import { Router } from "express";
 
-import { getQuestions, addQuestion, ediQuestion, deleteQuestion, getQuestionById } from "../controllers/questionsController.js";
+import { getQuestions, addQuestion, ediQuestion, deleteQuestion, getQuestionById, getAnswersByQuestionId } from "../controllers/questionsController.js";
+import { verifyJWT } from "../middleware/auth.js";
 
 const router = Router();
 
@@ -11,12 +12,15 @@ router.get('/', getQuestions);
 router.get('/:id', getQuestionById);
 
 // add a question - ask a question
-router.post('/', addQuestion);
+router.post('/', verifyJWT, addQuestion);
 
 // edit a question - edit an existig question
-router.patch('/:id', ediQuestion);
+router.patch('/:id', verifyJWT, ediQuestion);
 
 // delete a question - delete selected question from database
-router.delete('/:id', deleteQuestion);
+router.delete('/:id', verifyJWT, deleteQuestion);
+
+// answers - get all answers by question ID
+router.get('/:id/answers', getAnswersByQuestionId);
 
 export default router;

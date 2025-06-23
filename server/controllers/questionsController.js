@@ -59,7 +59,11 @@ export const getQuestionById = async (req, res) => {
         if (!questionById) {
             return res.status(404).send({ error: "Question not found." });
         }
-        res.send(questionById);
+        const user = await client.db('final').collection('users').findOne(
+            { _id: ObjectId.createFromHexString(questionById.creatorId) },
+            { projection: { username: 1, _id: 0 } }
+        );
+        res.send({ ...questionById, creatorUsername: user?.username });
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
@@ -82,9 +86,9 @@ export const addQuestion = async (req, res) => {
             answerCount: 0
         }
 
-        const res = await client.db('final').collection('questions').insertOne(newQuestion);
-        newQuestion._id = result.insertedId;
-        res.status(201).send({ success: 'Question added successfully.', question: newQuestion });
+        const result = await client.db('final').collection('questions').insertOne(newQuestion);
+        res.status(201).send({ ...newQuestion, _id: result.insertedId });
+
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
@@ -150,3 +154,21 @@ export const deleteQuestion = async (req, res) => {
     }
 };
 
+export const getAnswersByQuestionId = async (req, res) => {
+    const client = await connectDB();
+    try {
+        const questionId = req.params.id;
+        if (!ObjectId.isValid(questionId)) {
+            return res.status(400).send({ error: "Invalid question ID." });
+        }
+
+        const answers = await client.db('final').collection('answers').find({ questionId: questionId }).sort({ createDate: -1 }).toArray();
+
+        res.send(answers);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
+    } finally {
+        await client.close();
+    }
+};
