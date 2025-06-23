@@ -1,5 +1,5 @@
 import { ObjectId } from "mongodb";
-import { connectDB } from "./helper"
+import { connectDB } from "./helper.js"
 
 export const getQuestions = async (req, res) => {
     const client = await connectDB();

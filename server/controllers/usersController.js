@@ -27,6 +27,7 @@ export const login = async (req, res) => {
 }
 
 export const loginAuto = async (req, res) => {
+    const client = await connectDB();
     try {
         const authHeader = req.headers.authorization;
         if (!authHeader) {
@@ -40,7 +41,16 @@ export const loginAuto = async (req, res) => {
         if ("error" in verifyResults) {
             return res.status(401).send(verifyResults);
         }
-        res.send(verifyResults);
+        const userId = verifyResults._id;
+        if (!ObjectId.isValid(userId)) {
+            return res.status(400).send({ error: "Invalid user ID in token." });
+        }
+        const user = await client.db('final').collection('users').findOne({ _id: ObjectId.createFromHexString(userId) });
+        if (!user) {
+            return res.status(404).send({ error: "User not found." });
+        }
+        const { password, ...userWithoutPass } = user;
+        res.send({ userData: userWithoutPass });
     } catch (err) {
         console.error(err);
         res.status(500).send({ error: err, message: "Something went wrong with the server, please try again later." });
