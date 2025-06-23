@@ -14,7 +14,7 @@ export const verifyJWT = (req, res, next) => {
         if (err) {
             res.status(401).send({ error: 'Invalid or expired token.' });
         } else {
-            req.userId = decoded.id;
+            req.userId = decoded._id;
             next();
         }
     });

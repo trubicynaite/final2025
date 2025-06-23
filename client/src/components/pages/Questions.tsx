@@ -151,7 +151,7 @@ const Questions = () => {
 
     const handleAddNewQ = () => {
         const isLoggedIn = !!localStorage.getItem("accessJWT");
-        navigate(isLoggedIn ? "/addQuestion" : "/login");
+        navigate(isLoggedIn ? "/newQuestion" : "/login");
     };
 
     return (

@@ -83,8 +83,9 @@ export type QuestionsContextTypes = {
 
 export type Answer = {
     _id: string,
-    creatorId: User['_id'],
-    questionId: Question['_id'],
+    creatorId: string,
+    questionId: string,
     answerText: string,
-    createDate: string
+    createDate: string,
+    creatorUsername: string
 };

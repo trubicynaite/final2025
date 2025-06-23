@@ -2,7 +2,7 @@ import styled from "styled-components";
 import { useNavigate, useParams } from "react-router";
 import { useContext, useEffect, useState } from "react";
 
-import { Question, UserContextTypes } from "../../types";
+import { Question, UserContextTypes, Answer } from "../../types";
 import UsersContext from "../../contexts/UsersContext";
 
 const StyledQuestionPage = styled.section`
@@ -53,32 +53,62 @@ const SpecificQuestionPage = () => {
     const { id } = useParams<{ id: string }>();
     const [question, setQuestion] = useState<Question | null>(null);
     const [loading, setLoading] = useState(true);
+    const [answers, setAnswers] = useState<Answer[]>([]);
+    const [editAnswer, setEditAnswer] = useState<Answer | null>(null);
+    const [editText, setEditText] = useState('');
+    const [save, setSave] = useState(false);
+
     const navigate = useNavigate();
 
     const { loggedInUser } = useContext(UsersContext) as UserContextTypes;
 
     useEffect(() => {
-        const fetchQuestion = async () => {
-            try {
-                const res = await fetch(`http://localhost:5500/questions/${id}`);
-                const data = await res.json();
-                setQuestion(data);
-            } catch (error) {
-                console.error('Failed to fetch question:', error);
-                setQuestion(null);
-            } finally {
-                setLoading(false);
-            }
+        const fetchData = async () => {
+            setLoading(true);
+            const questionRes = await fetch(`http://localhost:5500/questions/${id}`);
+            const questionData = await questionRes.json();
+            setQuestion(questionData);
+
+            const answersRes = await fetch(`http://localhost:5500/questions/${id}/answers`);
+            const answersData = await answersRes.json();
+            setAnswers(answersData);
+            setLoading(false);
         };
-        fetchQuestion();
+        fetchData();
     }, [id]);
+
+    const startEditingAnswer = (answer: Answer) => {
+        setEditAnswer(answer);
+        setEditText(answer.answerText);
+    };
+
+    const saveAnswer = async () => {
+        if (!editAnswer) return;
+        setSave(true);
+        try {
+            const res = await fetch(`http://localhost:5500/answers/${editAnswer._id}`, {
+                method: "PATCH",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ answerText: editText }),
+            });
+
+            const updated = await res.json();
+
+            setAnswers((prev) =>
+                prev.map((a) => (a._id === updated._id ? updated : a))
+            );
+            setEditAnswer(null);
+            setEditText("");
+        } catch (err) {
+            console.error("Error saving answer:", err);
+            alert("Could not save answer.");
+        } finally {
+            setSave(false);
+        }
+    };
 
     if (loading) return <p>Loading...</p>;
     if (!question) return <p>Question not found.</p>;
-
-    const handleEdit = () => {
-        navigate(`/edit/${question._id}`);
-    };
 
     return (
         <StyledQuestionPage>
@@ -87,8 +117,50 @@ const SpecificQuestionPage = () => {
             <p>{question.questionText}</p>
 
             {loggedInUser?._id === question.creatorId && (
-                <button className="edit-btn" onClick={handleEdit}>Edit Question</button>
+                <button className="edit-btn" onClick={() => navigate(`/edit/${id}`)}>Edit Question</button>
             )}
+
+            <h3>Answers:</h3>
+            {answers.length ?
+                answers.map((answer) => (
+                    <div key={answer._id} className="answer">
+                        <p>{answer.answerText}</p>
+                        <p className="creator">
+                            By user ID: {answer.creatorUsername} on {answer.createDate}
+                            {loggedInUser?._id === answer.creatorId && (
+                                <span
+                                    className="edit-link"
+                                    onClick={() => startEditingAnswer(answer)}
+                                >
+                                    Edit
+                                </span>
+                            )}
+                        </p>
+                    </div>
+                )) :
+                <p>No answers yet.</p>
+            }
+
+            {editAnswer && (
+                <form
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        saveAnswer();
+                    }}
+                >
+                    <textarea
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                    />
+                    <button type="submit" disabled={save}>
+                        {save ? "Saving..." : "Save"}
+                    </button>
+                    <button type="button" onClick={() => setEditAnswer(null)}>
+                        Cancel
+                    </button>
+                </form>
+            )}
+
         </StyledQuestionPage>
     );
 }

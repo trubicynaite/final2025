@@ -1,25 +1,6 @@
 import { ObjectId } from "mongodb";
 import { connectDB } from "./helper.js"
 
-export const getAnswersByQuestionId = async (req, res) => {
-    const client = await connectDB();
-    try {
-        const questionId = req.params.id;
-        if (!ObjectId.isValid(questionId)) {
-            return res.status(400).send({ error: "Invalid question ID." });
-        }
-
-        const answers = await client.db('final').collection('answers').find({ questionId: questionId }).sort({ createDate: -1 }).toArray();
-
-        res.send(answers);
-    } catch (err) {
-        console.log(err);
-        res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
-    } finally {
-        await client.close();
-    }
-};
-
 export const addAnswer = async (req, res) => {
     const client = await connectDB();
     try {
