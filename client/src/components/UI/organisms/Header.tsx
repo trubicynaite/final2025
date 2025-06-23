@@ -73,6 +73,22 @@ const StyledHeader = styled.header`
                         }
                     }
                 }
+                > button {
+                background-color: transparent;
+                border: 1px solid white;
+                color: white;
+                font-size: 16px;
+                padding: 6px 12px;
+                border-radius: 6px;
+                cursor: pointer;
+                transition: all 0.3s ease;
+
+                &:hover {
+                    background-color: #f3aadb;
+                    color: #87085D;
+                    border-color: #f3aadb;
+                }
+            }
             }
         }
 
