@@ -49,6 +49,7 @@ export type RegisterFormValues = {
 export type Question = {
     _id: string,
     creatorId: User['_id'],
+    creatorUsername: string,
     createDate: string,
     category: string,
     questionHeader: string,
@@ -77,7 +78,7 @@ export type QuestionsContextTypes = {
         order?: 'asc' | 'desc',
         category?: string,
         title?: string
-    }) => Promise<void>;
+    }) => Promise<Question[] | undefined>;
 };
 
 export type Answer = {

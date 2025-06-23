@@ -5,7 +5,7 @@ import { getQuestions, addQuestion, ediQuestion, deleteQuestion } from "../contr
 const router = Router();
 
 // questions - show all questions
-router.get('/showAll', getQuestions);
+router.get('/', getQuestions);
 
 // add question - ask a question
 router.post('/add', addQuestion);
