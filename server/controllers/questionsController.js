@@ -78,6 +78,7 @@ export const addQuestion = async (req, res) => {
         const newQuestion = {
             creatorId: req.userId,
             createDate: new Date().toISOString().split('T')[0],
+            creatorUsername: req.body.creatorUsername,
             category: req.body.category,
             questionHeader: req.body.questionHeader,
             questionText: req.body.questionText,
@@ -87,8 +88,7 @@ export const addQuestion = async (req, res) => {
         }
 
         const result = await client.db('final').collection('questions').insertOne(newQuestion);
-        res.status(201).send({ ...newQuestion, _id: result.insertedId });
-
+        res.status(201).send(newQuestion);
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
@@ -125,7 +125,7 @@ export const ediQuestion = async (req, res) => {
         res.send(result.value);
     } catch (err) {
         console.log(err);
-        res.status(500).send({ error: err, message: `Something went wrong with servers, please try again later.` });
+        res.status(500).send({ error: err.toString(), message: "Something went wrong, please try again later." });
     } finally {
         await client.close();
     }
@@ -139,9 +139,9 @@ export const deleteQuestion = async (req, res) => {
             return res.status(400).send({ error: "Invalid question ID." });
         }
 
-        const res = await client.db('final').collection('questions').deleteOne({ _id: ObjectId.createFromHexString(questionId) });
+        const result = await client.db('final').collection('questions').deleteOne({ _id: ObjectId.createFromHexString(questionId) });
 
-        if (res.deletedCount) {
+        if (result.deletedCount) {
             res.send({ success: `Question with ID ${questionId} was deleted successfully.` });
         } else {
             res.status(404).send({ error: `Failed to delete. No question with ID ${questionId}.` })
