@@ -46,6 +46,28 @@ export const getQuestions = async (req, res) => {
     }
 };
 
+export const getQuestionById = async (req, res) => {
+    const client = await connectDB();
+    try {
+        const questionId = req.params.id;
+        if (!ObjectId.isValid(questionId)) {
+            return res.status(400).send({ error: "Invalid question ID." });
+        }
+
+        const questionById = await client.db('final').collection('questions').findOne({ _id: ObjectId.createFromHexString(questionId) });
+
+        if (!questionById) {
+            return res.status(404).send({ error: "Question not found." });
+        }
+        res.send(questionById);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
+    } finally {
+        await client.close();
+    }
+};
+
 export const addQuestion = async (req, res) => {
     const client = await connectDB();
     try {
