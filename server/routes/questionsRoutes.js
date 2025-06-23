@@ -7,16 +7,16 @@ const router = Router();
 // questions - show all questions
 router.get('/', getQuestions);
 
-//questions - get specific question by ID
+// questions - get a specific question by ID
 router.get('/:id', getQuestionById);
 
-// add question - ask a question
-router.post('/add', addQuestion);
+// add a question - ask a question
+router.post('/', addQuestion);
 
-// edit question - edit an existig question
-router.patch('/edit', ediQuestion);
+// edit a question - edit an existig question
+router.patch('/:id', ediQuestion);
 
-// delete question - delete selected question from database
-router.delete('/delete', deleteQuestion);
+// delete a question - delete selected question from database
+router.delete('/:id', deleteQuestion);
 
 export default router;
