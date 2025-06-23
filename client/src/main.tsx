@@ -4,11 +4,14 @@ import App from './App.tsx';
 
 import { BrowserRouter } from 'react-router';
 import { UserProvider } from './contexts/UsersContext.tsx';
+import { QuestionsProvider } from './contexts/QuestionsContext.tsx';
 
 createRoot(document.getElementById('root') as HTMLDivElement).render(
     <BrowserRouter>
         <UserProvider>
-            <App />
+            <QuestionsProvider>
+                <App />
+            </QuestionsProvider>
         </UserProvider>
     </BrowserRouter>
 )

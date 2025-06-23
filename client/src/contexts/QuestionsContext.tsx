@@ -60,7 +60,7 @@ const QuestionsProvider = ({ children }: ChildrenElementProp) => {
                 queryParams.append("category", filters.category);
             }
             if (filters?.title) {
-                queryParams.append("titlw", filters.title);
+                queryParams.append("title", filters.title);
             }
 
             const res = await fetch(`http://localhost:5500/questions?${queryParams.toString()}`);
@@ -69,6 +69,7 @@ const QuestionsProvider = ({ children }: ChildrenElementProp) => {
                 type: 'setData',
                 data
             });
+            return data;
         } catch (err) {
             console.error("Failed to fetch filtered questions:", err);
         }
