@@ -107,6 +107,34 @@ const SpecificQuestionPage = () => {
         }
     };
 
+    const handleDelete = async () => {
+        const confirmed = window.confirm("Are you sure you want to delete this question?");
+        if (!confirmed) return;
+
+        try {
+            const token = localStorage.getItem("accessJWT");
+
+            const res = await fetch(`http://localhost:5500/questions/${id}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+
+            if (res.ok) {
+                alert("Question deleted successfully.");
+                navigate("/questions");
+            } else {
+                const errorData = await res.json();
+                alert(`Failed to delete question: ${errorData.error}`);
+            }
+        } catch (err) {
+            alert("Something went wrong while deleting the question.");
+            console.error(err);
+        }
+    };
+
+
     if (loading) return <p>Loading...</p>;
     if (!question) return <p>Question not found.</p>;
 
@@ -117,7 +145,10 @@ const SpecificQuestionPage = () => {
             <p>{question.questionText}</p>
 
             {loggedInUser?._id === question.creatorId && (
-                <button className="edit-btn" onClick={() => navigate(`/edit/${id}`)}>Edit Question</button>
+                <>
+                    <button className="edit-btn" onClick={() => navigate(`/edit/${id}`)}>Edit Question</button>
+                    <button className="edit-btn" onClick={handleDelete}>Delete Question</button>
+                </>
             )}
 
             <h3>Answers:</h3>
