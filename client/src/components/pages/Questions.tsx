@@ -1,5 +1,6 @@
 import { useContext, useState } from "react";
 import styled from "styled-components";
+import { useNavigate } from "react-router";
 
 import QuestionsContext from "../../contexts/QuestionsContext";
 import { QuestionsContextTypes } from "../../types";
@@ -14,6 +15,22 @@ const StyledQuestions = styled.section`
     color: #EB88CA;
     font-size: 28px;
     margin-top: 10px;
+    }
+
+    .addQ{
+    background-color: #87085D;
+    color: white;
+    border: none;
+    padding: 10px 15px;
+    font-size: 15px;
+    border-radius: 6px;
+    margin: 20px auto;
+    display: block;
+    cursor: pointer;
+
+    &:hover {
+     background-color: #d16db2;
+        }
     }
 
     >form{
@@ -59,6 +76,7 @@ const StyledQuestions = styled.section`
       align-items: center;
       gap: 15px; 
     }
+
     >input,
       select {
         width: auto;
@@ -74,6 +92,8 @@ const StyledQuestions = styled.section`
 const Questions = () => {
 
     const { questions, fetchFiltered } = useContext(QuestionsContext) as QuestionsContextTypes;
+
+    const navigate = useNavigate();
 
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("");
@@ -129,6 +149,10 @@ const Questions = () => {
         await fetchFiltered();
     };
 
+    const handleAddNewQ = () => {
+        const isLoggedIn = !!localStorage.getItem("accessJWT");
+        navigate(isLoggedIn ? "/addQuestion" : "/login");
+    };
 
     return (
         <StyledQuestions>
@@ -176,7 +200,7 @@ const Questions = () => {
                 <button type="submit">Apply</button>
                 <button type="button" onClick={clearFilters}>Clear Filters</button>
             </form>
-
+            <button className="addQ" onClick={handleAddNewQ}>+ Add question</button>
             <div>
                 {loading ? (
                     <p>Loading questions...</p>
