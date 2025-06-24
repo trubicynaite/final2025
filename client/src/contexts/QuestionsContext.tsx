@@ -75,11 +75,35 @@ const QuestionsProvider = ({ children }: ChildrenElementProp) => {
         }
     };
 
-    const addQuestion = (newQ: Question) => {
-        dispatch({
-            type: 'addQuestion',
-            newQuestion: newQ
-        })
+    const addQuestion = async (newQuestionData: {
+        category: string;
+        questionHeader: string;
+        questionText: string;
+    }) => {
+        try {
+            const token = localStorage.getItem("accessJWT");
+
+            const res = await fetch("http://localhost:5500/questions", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    'Authorization': `Bearer ${token}`,
+                },
+                body: JSON.stringify(newQuestionData),
+            });
+
+            const createdQuestion: Question = await res.json();
+
+            dispatch({
+                type: "addQuestion",
+                newQuestion: createdQuestion,
+            });
+
+            return createdQuestion;
+        } catch (error) {
+            console.error("Error creating question:", error);
+            throw error;
+        }
     };
 
     const editQuestion = (updatedQ: Partial<Question> & { _id: string }) => {

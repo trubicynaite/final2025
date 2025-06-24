@@ -1,22 +1,33 @@
 import { Router } from "express";
 
-import { getQuestions, addQuestion, ediQuestion, deleteQuestion, getQuestionById } from "../controllers/questionsController.js";
+import { getQuestions, addQuestion, editQuestion, deleteQuestion, getQuestionById, getAnswersByQuestionId, questionReaction } from "../controllers/questionsController.js";
+import { verifyJWT } from "../middleware/auth.js";
+import { addAnswer } from "../controllers/answersController.js";
 
 const router = Router();
 
 // questions - show all questions
 router.get('/', getQuestions);
 
-//questions - get specific question by ID
+// questions - get a specific question by ID
 router.get('/:id', getQuestionById);
 
-// add question - ask a question
-router.post('/add', addQuestion);
+// add a question - ask a question
+router.post('/', verifyJWT, addQuestion);
 
-// edit question - edit an existig question
-router.patch('/edit', ediQuestion);
+// edit a question - edit an existig question
+router.patch('/:id', verifyJWT, editQuestion);
 
-// delete question - delete selected question from database
-router.delete('/delete', deleteQuestion);
+// delete a question - delete selected question from database
+router.delete('/:id', verifyJWT, deleteQuestion);
+
+// answers - get all answers by question ID
+router.get('/:id/answers', getAnswersByQuestionId);
+
+// add an answer - add a new answer to a specific question by question ID
+router.post('/:id/answers', verifyJWT, addAnswer);
+
+// like or dislike a question
+router.patch('/:id/reaction', verifyJWT, questionReaction);
 
 export default router;
