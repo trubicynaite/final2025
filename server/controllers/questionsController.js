@@ -59,7 +59,11 @@ export const getQuestionById = async (req, res) => {
         if (!questionById) {
             return res.status(404).send({ error: "Question not found." });
         }
-        res.send(questionById);
+        const user = await client.db('final').collection('users').findOne(
+            { _id: ObjectId.createFromHexString(questionById.creatorId) },
+            { projection: { username: 1, _id: 0 } }
+        );
+        res.send({ ...questionById, creatorUsername: user?.username });
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
@@ -71,9 +75,13 @@ export const getQuestionById = async (req, res) => {
 export const addQuestion = async (req, res) => {
     const client = await connectDB();
     try {
+
+        const user = await client.db('final').collection('users').findOne({ _id: ObjectId.createFromHexString(req.userId) });
+
         const newQuestion = {
             creatorId: req.userId,
-            createDate: new Date().toISOString().split('T')[0],
+            createDate: new Date(),
+            creatorUsername: user.username,
             category: req.body.category,
             questionHeader: req.body.questionHeader,
             questionText: req.body.questionText,
@@ -82,9 +90,14 @@ export const addQuestion = async (req, res) => {
             answerCount: 0
         }
 
-        const res = await client.db('final').collection('questions').insertOne(newQuestion);
-        newQuestion._id = result.insertedId;
-        res.status(201).send({ success: 'Question added successfully.', question: newQuestion });
+        const result = await client.db('final').collection('questions').insertOne(newQuestion);
+
+        await client.db('final').collection('users').updateOne(
+            { _id: ObjectId.createFromHexString(req.userId) },
+            { $push: { createdQuestions: result.insertedId.toString() } }
+        );
+
+        res.status(201).send({ ...newQuestion, _id: result.insertedId.toString() });
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
@@ -93,7 +106,7 @@ export const addQuestion = async (req, res) => {
     }
 };
 
-export const ediQuestion = async (req, res) => {
+export const editQuestion = async (req, res) => {
     const client = await connectDB();
     try {
         const questionId = req.params.id;
@@ -101,27 +114,30 @@ export const ediQuestion = async (req, res) => {
             return res.status(400).send({ error: "Invalid question ID." });
         }
 
-        const updates = { ...req.body };
+        const updates = { ...req.body, lastEdited: new Date() };
 
         delete updates._id;
         delete updates.creatorId;
+        delete updates.creatorUsername;
         delete updates.createDate;
         delete updates.likeCount;
         delete updates.dislikeCount;
         delete updates.answerCount;
 
-        const result = await client.db('final').collection('questions').findOneAndUpdate({ _id: ObjectId.createFromHexString(questionId) },
-            { $set: updates },
-            { returnDocument: 'after' });
+        const result = await client.db('final').collection('questions').updateOne(
+            { _id: ObjectId.createFromHexString(questionId) },
+            { $set: updates });
 
-        if (!result.value) {
+        const updatedQuestion = await client.db('final').collection('questions').findOne({ _id: ObjectId.createFromHexString(questionId) });
+
+        if (!updatedQuestion) {
             return res.status(404).send({ error: "Question not found." });
         }
 
-        res.send(result.value);
+        res.send(updatedQuestion);
     } catch (err) {
         console.log(err);
-        res.status(500).send({ error: err, message: `Something went wrong with servers, please try again later.` });
+        res.status(500).send({ error: err.toString(), message: "Something went wrong, please try again later." });
     } finally {
         await client.close();
     }
@@ -135,9 +151,9 @@ export const deleteQuestion = async (req, res) => {
             return res.status(400).send({ error: "Invalid question ID." });
         }
 
-        const res = await client.db('final').collection('questions').deleteOne({ _id: ObjectId.createFromHexString(questionId) });
+        const result = await client.db('final').collection('questions').deleteOne({ _id: ObjectId.createFromHexString(questionId) });
 
-        if (res.deletedCount) {
+        if (result.deletedCount) {
             res.send({ success: `Question with ID ${questionId} was deleted successfully.` });
         } else {
             res.status(404).send({ error: `Failed to delete. No question with ID ${questionId}.` })
@@ -150,3 +166,96 @@ export const deleteQuestion = async (req, res) => {
     }
 };
 
+export const getAnswersByQuestionId = async (req, res) => {
+    const client = await connectDB();
+    try {
+        const questionId = req.params.id;
+        if (!ObjectId.isValid(questionId)) {
+            return res.status(400).send({ error: "Invalid question ID." });
+        }
+
+        const answers = await client.db('final').collection('answers').find({ questionId: questionId }).sort({ createDate: -1 }).toArray();
+
+        res.send(answers);
+    } catch (err) {
+        console.log(err);
+        res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
+    } finally {
+        await client.close();
+    }
+};
+
+export const questionReaction = async (req, res) => {
+    const client = await connectDB();
+    try {
+        const questionId = req.params.id;
+        const userId = req.userId;
+        const { reaction } = req.body;
+
+        if (!ObjectId.isValid(questionId)) {
+            return res.status(400).send({ error: "Invalid question ID." });
+        }
+
+        const user = await client.db('final').collection('users').findOne({ _id: ObjectId.createFromHexString(userId) });
+        if (!user) return res.status(404).send({ error: "User not found." });
+
+        const question = await client.db('final').collection('questions').findOne({ _id: ObjectId.createFromHexString(questionId) });
+        if (!question) return res.status(404).send({ error: "Question not found." });
+
+        const liked = user.likedQuestions?.includes(questionId);
+        const disliked = user.dislikedQuestions?.includes(questionId);
+
+        let questionUpdate = {};
+        let userUpdate = { $pull: {}, $addToSet: {} };
+
+        if (reaction === "like") {
+            if (liked) {
+                questionUpdate.$inc = { likeCount: -1 };
+                userUpdate.$pull.likedQuestions = questionId;
+            } else {
+                questionUpdate.$inc = { likeCount: 1 };
+                userUpdate.$addToSet.likedQuestions = questionId;
+
+                if (disliked) {
+                    questionUpdate.$inc.dislikeCount = -1;
+                    userUpdate.$pull.dislikedQuestions = questionId;
+                }
+            }
+        } else if (reaction === "dislike") {
+            if (disliked) {
+                questionUpdate.$inc = { dislikeCount: -1 };
+                userUpdate.$pull.dislikedQuestions = questionId;
+            } else {
+                questionUpdate.$inc = { dislikeCount: 1 };
+                userUpdate.$addToSet.dislikedQuestions = questionId;
+
+                if (liked) {
+                    questionUpdate.$inc.likeCount = -1;
+                    userUpdate.$pull.likedQuestions = questionId;
+                }
+            }
+        }
+
+        await client.db('final').collection('questions').updateOne(
+            { _id: ObjectId.createFromHexString(questionId) },
+            questionUpdate
+        );
+
+        if (!Object.keys(userUpdate.$pull).length) delete userUpdate.$pull;
+        if (!Object.keys(userUpdate.$addToSet).length) delete userUpdate.$addToSet;
+
+        await client.db('final').collection('users').updateOne(
+            { _id: ObjectId.createFromHexString(userId) },
+            userUpdate
+        );
+
+        const updatedQuestion = await client.db('final').collection('questions').findOne({ _id: ObjectId.createFromHexString(questionId) });
+
+        res.send(updatedQuestion);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err.toString(), message: "Something went wrong, please try again later." });
+    } finally {
+        await client.close();
+    }
+};
