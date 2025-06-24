@@ -13,33 +13,65 @@ const EditQuestionPage = styled.section`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  gap: 16px;
+  color: #f3aadb;
+  text-align: center;
 
-  >label {
-    font-weight: bold;
-    margin-bottom: 4px;
-  }
-  
-  >input, select, textarea {
-    width: 100%;
-    padding: 8px;
-    font-size: 16px;
-    border-radius: 6px;
-    border: 1px solid #ccc;
-  }
-  
-  >button {
-    max-width: 150px;
-    padding: 10px;
-    margin-top: 20px;
-    background-color: #EB88CA;
-    color: #fff;
-    font-weight: bold;
-    border: none;
-    border-radius: 6px;
-    cursor: pointer;
-    
-    &:hover {
-      background-color: #d36da8;
+  >h2{
+    color: #EB88CA;
+    font-size: 28px;
+    margin-top: 10px;
+    }
+
+    form {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+
+    .edit {
+      display: flex;
+      flex-direction: column;
+      gap: 24px;
+      text-align: left;
+
+      > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+      }
+
+      label {
+        font-weight: bold;
+        color: #f3aadb;
+      }
+
+      input,
+      select,
+      textarea {
+        width: 100%;
+        padding: 10px 12px;
+        font-size: 16px;
+        border-radius: 6px;
+        border: 2px solid #f3aadb;
+        background-color: transparent;
+        color: #fff;
+      }
+    }
+
+    > button {
+      max-width: 150px;
+      padding: 12px 20px;
+      margin: 0 auto;
+      background-color: #EB88CA;
+      color: #87085D;
+      font-weight: bold;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #d36da8;
+      }
     }
   }
 
@@ -146,42 +178,49 @@ const EditQuestion = () => {
         <EditQuestionPage>
             <h2>Edit Question</h2>
             <form onSubmit={handleSubmit}>
-                <label htmlFor="category">Category</label>
-                <select
-                    id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                >
-                    <option value="">--Select category--</option>
-                    <option value="face">Face</option>
-                    <option value="eyes">Eyes</option>
-                    <option value="eyebrows">Eyebrows</option>
-                    <option value="lips">Lips</option>
-                </select>
-
-                <label htmlFor="header">Question Header</label>
-                <input
-                    id="header"
-                    type="text"
-                    value={questionHeader}
-                    onChange={(e) => setQuestionHeader(e.target.value)}
-                    required
-                />
-
-                <label htmlFor="text">Question Text</label>
-                <textarea
-                    id="text"
-                    rows={6}
-                    value={questionText}
-                    onChange={(e) => setQuestionText(e.target.value)}
-                    required
-                />
+                <div className="edit">
+                    <div>
+                        <label htmlFor="header">Question Header</label>
+                        <input
+                            id="header"
+                            type="text"
+                            value={questionHeader}
+                            onChange={(e) => setQuestionHeader(e.target.value)}
+                            required
+                        />
+                    </div>
+                    <div>
+                        <label htmlFor="category">Category</label>
+                        <select
+                            id="category"
+                            value={category}
+                            onChange={(e) => setCategory(e.target.value)}
+                            required
+                        >
+                            <option value="">--Select category--</option>
+                            <option value="face">Face</option>
+                            <option value="eyes">Eyes</option>
+                            <option value="eyebrows">Eyebrows</option>
+                            <option value="lips">Lips</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label htmlFor="text">Question Text</label>
+                        <textarea
+                            id="text"
+                            rows={6}
+                            value={questionText}
+                            onChange={(e) => setQuestionText(e.target.value)}
+                            required
+                        />
+                    </div>
+                </div>
 
                 {error && <p className="error">{error}</p>}
 
                 <button type="submit">Save Changes</button>
             </form>
+
         </EditQuestionPage>
     );
 };

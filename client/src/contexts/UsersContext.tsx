@@ -24,7 +24,7 @@ const UsersContext = createContext<UserContextTypes | undefined>(undefined);
 const UserProvider = ({ children }: ChildrenElementProp) => {
 
     const [users, dispatch] = useReducer(reducer, []);
-    const [loggedInUser, setLoggedInUser] = useState<User | null>(null);
+    const [loggedInUser, setLoggedInUser] = useState<Omit<User, 'password' | 'passwordText'> | null>(null);
     const navigate = useNavigate();
 
     const logOut = () => {
@@ -37,7 +37,7 @@ const UserProvider = ({ children }: ChildrenElementProp) => {
     type BackLoginResponse = { error: string } | { success: string, userData: User };
 
     const login = async (
-        loginInfo: Pick<User, 'username' | 'password'>,
+        credentials: { username: string; password: string },
         keepLoggedIn: boolean) => {
 
         const res = await fetch(`http://localhost:5500/users/login`, {
@@ -45,7 +45,7 @@ const UserProvider = ({ children }: ChildrenElementProp) => {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify(loginInfo)
+            body: JSON.stringify(credentials)
         });
 
         const authHeader = res.headers.get('Authorization');

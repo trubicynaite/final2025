@@ -178,3 +178,78 @@ export const getAnswersByQuestionId = async (req, res) => {
         await client.close();
     }
 };
+
+export const questionReaction = async (req, res) => {
+    const client = await connectDB();
+    try {
+        const questionId = req.params.id;
+        const userId = req.userId;
+        const { reaction } = req.body;
+
+        if (!ObjectId.isValid(questionId)) {
+            return res.status(400).send({ error: "Invalid question ID." });
+        }
+
+        const user = await client.db('final').collection('users').findOne({ _id: ObjectId.createFromHexString(userId) });
+        if (!user) return res.status(404).send({ error: "User not found." });
+
+        const question = await client.db('final').collection('questions').findOne({ _id: ObjectId.createFromHexString(questionId) });
+        if (!question) return res.status(404).send({ error: "Question not found." });
+
+        const liked = user.likedQuestions?.includes(questionId);
+        const disliked = user.dislikedQuestions?.includes(questionId);
+
+        let questionUpdate = {};
+        let userUpdate = { $pull: {}, $addToSet: {} };
+
+        if (reaction === "like") {
+            if (liked) {
+                questionUpdate.$inc = { likeCount: -1 };
+                userUpdate.$pull.likedQuestions = questionId;
+            } else {
+                questionUpdate.$inc = { likeCount: 1 };
+                userUpdate.$addToSet.likedQuestions = questionId;
+
+                if (disliked) {
+                    questionUpdate.$inc.dislikeCount = -1;
+                    userUpdate.$pull.dislikedQuestions = questionId;
+                }
+            }
+        } else if (reaction === "dislike") {
+            if (disliked) {
+                questionUpdate.$inc = { dislikeCount: -1 };
+                userUpdate.$pull.dislikedQuestions = questionId;
+            } else {
+                questionUpdate.$inc = { dislikeCount: 1 };
+                userUpdate.$addToSet.dislikedQuestions = questionId;
+
+                if (liked) {
+                    questionUpdate.$inc.likeCount = -1;
+                    userUpdate.$pull.likedQuestions = questionId;
+                }
+            }
+        }
+
+        await client.db('final').collection('questions').updateOne(
+            { _id: ObjectId.createFromHexString(questionId) },
+            questionUpdate
+        );
+
+        if (!Object.keys(userUpdate.$pull).length) delete userUpdate.$pull;
+        if (!Object.keys(userUpdate.$addToSet).length) delete userUpdate.$addToSet;
+
+        await client.db('final').collection('users').updateOne(
+            { _id: ObjectId.createFromHexString(userId) },
+            userUpdate
+        );
+
+        const updatedQuestion = await client.db('final').collection('questions').findOne({ _id: ObjectId.createFromHexString(questionId) });
+
+        res.send(updatedQuestion);
+    } catch (err) {
+        console.error(err);
+        res.status(500).send({ error: err.toString(), message: "Something went wrong, please try again later." });
+    } finally {
+        await client.close();
+    }
+};

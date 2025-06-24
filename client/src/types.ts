@@ -1,7 +1,7 @@
 export type ChildrenElementProp = { children: React.ReactElement };
 export type ChildrenNodeProp = { children: React.ReactNode };
 
-export type User = {
+export type UserFull = {
     _id: string,
     username: string,
     email: string,
@@ -17,6 +17,8 @@ export type User = {
     dislikedQuestions: string[]
 };
 
+export type User = Omit<UserFull, 'password' | 'passwordText'>
+
 export type UsersReducerActionTypes =
     { type: 'setData', data: User[] } |
     { type: 'addUser', newUser: User } |
@@ -25,16 +27,17 @@ export type UsersReducerActionTypes =
 
 export type UserContextTypes = {
     users: User[],
-    loggedInUser: Omit<User, 'password' | "passwordText"> | null,
+    loggedInUser: User | null,
     logOut: () => void,
-    login: ({ username, password }: Pick<User, "username" | "password">, keepLoggedIn: boolean) => Promise<{ error: string } | { success: string }>,
+    login: (credentials: { username: string; password: string }, keepLoggedIn: boolean) => Promise<{ error: string } | { success: string }>,
     editUser: ({ keyWord, newValue }: {
         keyWord: keyof Omit<User, "_id" | "username" | "dob" | "createDate" | "createdQuestions" | "answeredQuestions" | "likedQuestions" | "dislikedQuestions">;
         newValue: string;
     }) => void,
     dispatch: React.Dispatch<UsersReducerActionTypes>,
-    setLoggedInUser: React.Dispatch<React.SetStateAction<User | null>>
+    setLoggedInUser: React.Dispatch<React.SetStateAction<Omit<User, 'password' | 'passwordText'> | null>>
 };
+
 
 export type RegisterFormValues = {
     username: string;

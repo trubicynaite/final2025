@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getQuestions, addQuestion, editQuestion, deleteQuestion, getQuestionById, getAnswersByQuestionId } from "../controllers/questionsController.js";
+import { getQuestions, addQuestion, editQuestion, deleteQuestion, getQuestionById, getAnswersByQuestionId, questionReaction } from "../controllers/questionsController.js";
 import { verifyJWT } from "../middleware/auth.js";
 import { addAnswer } from "../controllers/answersController.js";
 
@@ -26,5 +26,8 @@ router.get('/:id/answers', getAnswersByQuestionId);
 
 // add an answer - add a new answer to a specific question by question ID
 router.post('/:id/answers', verifyJWT, addAnswer);
+
+// like or dislike a question
+router.patch('/:id/reaction', verifyJWT, questionReaction);
 
 export default router;
