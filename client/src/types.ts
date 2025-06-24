@@ -88,5 +88,6 @@ export type Answer = {
     questionId: string,
     answerText: string,
     createDate: string,
-    creatorUsername: string
+    creatorUsername: string,
+    lastEdited: string
 };
