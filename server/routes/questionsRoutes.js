@@ -1,6 +1,6 @@
 import { Router } from "express";
 
-import { getQuestions, addQuestion, ediQuestion, deleteQuestion, getQuestionById, getAnswersByQuestionId } from "../controllers/questionsController.js";
+import { getQuestions, addQuestion, editQuestion, deleteQuestion, getQuestionById, getAnswersByQuestionId } from "../controllers/questionsController.js";
 import { verifyJWT } from "../middleware/auth.js";
 
 const router = Router();
@@ -15,7 +15,7 @@ router.get('/:id', getQuestionById);
 router.post('/', verifyJWT, addQuestion);
 
 // edit a question - edit an existig question
-router.patch('/:id', verifyJWT, ediQuestion);
+router.patch('/:id', verifyJWT, editQuestion);
 
 // delete a question - delete selected question from database
 router.delete('/:id', verifyJWT, deleteQuestion);
