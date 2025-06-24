@@ -91,7 +91,13 @@ export const addQuestion = async (req, res) => {
         }
 
         const result = await client.db('final').collection('questions').insertOne(newQuestion);
-        res.status(201).send(newQuestion);
+
+        await client.db('final').collection('users').updateOne(
+            { _id: ObjectId.createFromHexString(req.userId) },
+            { $push: { createdQuestions: result.insertedId.toString() } }
+        );
+
+        res.status(201).send({ ...newQuestion, _id: result.insertedId.toString() });
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
