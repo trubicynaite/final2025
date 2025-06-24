@@ -71,6 +71,120 @@ const StyledQuestionPage = styled.section`
         }
   }
   }
+  >h3 {
+    margin-top: 40px;
+    color: #EB88CA;
+  }
+
+  >div.answer {
+    background-color: transparent;
+    border: 1px solid #f3aadb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+    position: relative;
+
+    >p {
+      margin: 0 0 8px 0;
+      font-size: 15px;
+    }
+
+   >p.creator {
+      font-size: 13px;
+      color: #b673aa;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 8px;
+
+      >strong {
+        color: #eb88ca;
+      }
+
+      >span.edit-link {
+        color: #f3aadb;
+        cursor: pointer;
+        text-decoration: underline;
+        margin-left: 10px;
+
+        &:hover {
+          color: #e97fc3;
+        }
+      }
+
+      >button.delete {
+        background: none;
+        border: none;
+        color: #f3aadb;
+        cursor: pointer;
+        margin-left: 10px;
+        padding: 0;
+        text-decoration: underline;
+
+        &:hover {
+          color: #e97fc3;
+        }
+      }
+    }
+  }
+
+  >form {
+    max-width: 100%;
+    margin-top: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+
+  >textarea {
+    width: 100%;
+    min-height: 100px;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
+    border: 1px solid #f3aadb;
+    resize: vertical;
+
+    &:focus {
+      outline: none;
+      border-color: #eb88ca;
+      box-shadow: 0 0 5px #eb88ca;
+    }
+  }
+
+  >form{
+    >div.formBtn{
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+
+    >button{
+    background-color: #f3aadb;
+    border: none;
+    color: #87085d;
+    font-size: 15px;
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+
+    &:hover {
+    background-color: #e97fc3;
+  }
+    }
+
+    >button[type="button"] {
+    background-color: transparent;
+    border: 1px solid #f3aadb;
+    color: #f3aadb;
+
+    &:hover {
+    background-color: #e97fc3;
+    color: #87085d;
+    }
+    }
+  }
+}
 `;
 
 const SpecificQuestionPage = () => {
@@ -191,7 +305,6 @@ const SpecificQuestionPage = () => {
         }
     };
 
-
     if (loading) return <p>Loading...</p>;
     if (!question) return <p>Question not found.</p>;
 
@@ -206,17 +319,13 @@ const SpecificQuestionPage = () => {
                         <p className="creator">Edited on: {new Date(question.lastEdited).toLocaleString()}</p>)
                 }
             </div>
-
-
             <p>{question.questionText}</p>
-
             {loggedInUser?._id === question.creatorId && (
                 <div className="buttons">
                     <button className="edit" onClick={() => navigate(`/edit/${id}`)}>Edit Question</button>
                     <button className="delete" onClick={handleDelete}>Delete Question</button>
                 </div>
             )}
-
             <h3>Answers:</h3>
             {question && answers.length ?
                 answers.map((answer) => {
@@ -224,16 +333,17 @@ const SpecificQuestionPage = () => {
                     const isCurrentUser = loggedInUser?._id === answer.creatorId;
                     return (
                         <div key={answer._id} className="answer">
-                            <p>{answer.answerText}</p>
                             <p className="creator">
-                                By user: {answer.creatorUsername}
-                                {isAuthor && <strong style={{ marginLeft: "10px", color: "#EB88CA" }}> (answered by author)</strong>}
-                                {" on "}{new Date(answer.createDate).toLocaleString()}
-
-                                {answer.lastEdited && (
-                                    <span> (edited on {new Date(answer.lastEdited).toLocaleString()})</span>
+                                Answered by:{" "}
+                                {isAuthor ? (
+                                    <span style={{ marginLeft: "10px", color: "#EB88CA" }}>
+                                        Author
+                                    </span>
+                                ) : (
+                                    <span style={{ marginLeft: "10px", color: "#555" }}>
+                                        {answer.creatorUsername}
+                                    </span>
                                 )}
-
                                 {isCurrentUser && (
                                     <>
                                         <span
@@ -253,6 +363,8 @@ const SpecificQuestionPage = () => {
                                     </>
                                 )}
                             </p>
+                            <p>{answer.answerText}</p>
+
                         </div>
                     );
                 }) :
@@ -295,10 +407,12 @@ const SpecificQuestionPage = () => {
                                 rows={4}
                                 placeholder="Write your answer here..."
                             />
-                            <button type="submit">Publish Answer</button>
-                            <button type="button" onClick={() => setAnswerForm(false)}>
-                                Cancel
-                            </button>
+                            <div className="formBtn">
+                                <button type="submit">Publish answer</button>
+                                <button type="button" onClick={() => setAnswerForm(false)}>
+                                    Cancel
+                                </button>
+                            </div>
                         </form>
                     )}
                 </>
