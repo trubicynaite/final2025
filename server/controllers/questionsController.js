@@ -75,10 +75,13 @@ export const getQuestionById = async (req, res) => {
 export const addQuestion = async (req, res) => {
     const client = await connectDB();
     try {
+
+        const user = await client.db('final').collection('users').findOne({ _id: ObjectId.createFromHexString(req.userId) });
+
         const newQuestion = {
             creatorId: req.userId,
-            createDate: new Date().toISOString().split('T')[0],
-            creatorUsername: req.body.creatorUsername,
+            createDate: new Date(),
+            creatorUsername: user.username,
             category: req.body.category,
             questionHeader: req.body.questionHeader,
             questionText: req.body.questionText,
@@ -97,7 +100,7 @@ export const addQuestion = async (req, res) => {
     }
 };
 
-export const ediQuestion = async (req, res) => {
+export const editQuestion = async (req, res) => {
     const client = await connectDB();
     try {
         const questionId = req.params.id;
@@ -105,24 +108,27 @@ export const ediQuestion = async (req, res) => {
             return res.status(400).send({ error: "Invalid question ID." });
         }
 
-        const updates = { ...req.body };
+        const updates = { ...req.body, lastEdited: new Date() };
 
         delete updates._id;
         delete updates.creatorId;
+        delete updates.creatorUsername;
         delete updates.createDate;
         delete updates.likeCount;
         delete updates.dislikeCount;
         delete updates.answerCount;
 
-        const result = await client.db('final').collection('questions').findOneAndUpdate({ _id: ObjectId.createFromHexString(questionId) },
-            { $set: updates },
-            { returnDocument: 'after' });
+        const result = await client.db('final').collection('questions').updateOne(
+            { _id: ObjectId.createFromHexString(questionId) },
+            { $set: updates });
 
-        if (!result.value) {
+        const updatedQuestion = await client.db('final').collection('questions').findOne({ _id: ObjectId.createFromHexString(questionId) });
+
+        if (!updatedQuestion) {
             return res.status(404).send({ error: "Question not found." });
         }
 
-        res.send(result.value);
+        res.send(updatedQuestion);
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err.toString(), message: "Something went wrong, please try again later." });

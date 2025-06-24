@@ -64,11 +64,11 @@ const StyledCard = styled.div`
         margin-top: 15px;
         display: flex;
         gap: 10px;
-        flex-wrap: wrap;
+        flex-direction: column;
 
         > button {
             background-color: transparent;
-            border: 1.5px solid #f3aadb;
+            border: 1px solid #f3aadb;
             color: #f3aadb;
             padding: 6px 12px;
             font-size: 15px;
@@ -81,8 +81,18 @@ const StyledCard = styled.div`
                 color: #87085D;
             }
         }
+        @media(min-width: 575px){
+            flex-direction: row;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+
+            >button{
+                width: auto;
+                min-width: 120px;
+            }
+        }
     }
-    }
+ }
 `;
 
 const QuestionCard = ({ data }: Props) => {
@@ -100,10 +110,14 @@ const QuestionCard = ({ data }: Props) => {
 
     return (
         <StyledCard>
-            <h6>Created by: {data.creatorUsername}. Create date: {data.createDate}</h6>
+            <h6>Created by: {data.creatorUsername}. Created: {" "}{new Date(data.createDate).toLocaleString()}</h6>
             <h5>Category: {data.category}</h5>
             <h3>{data.questionHeader}</h3>
             <p>{data.questionText}</p>
+            {
+                data.lastEdited && (
+                    <h6>Edited on: {new Date(data.lastEdited).toLocaleString()}</h6>)
+            }
             <div className="bottom">
                 <div className="likes">
                     <p>Likes: {data.likeCount}</p>

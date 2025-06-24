@@ -56,7 +56,8 @@ export type Question = {
     questionText: string,
     likeCount: number,
     dislikeCount: number,
-    answerCount: number
+    answerCount: number,
+    lastEdited: string
 };
 
 export type QuestionsReducerActionTypes =

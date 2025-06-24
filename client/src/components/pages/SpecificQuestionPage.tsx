@@ -23,28 +23,53 @@ const StyledQuestionPage = styled.section`
     margin: 8px 0;
   }
 
-  >p.creator {
+  >div.creator {
     font-size: 14px;
     color: #aaa;
     margin-bottom: 20px;
     text-align: center;
   }
 
-  >button.edit-btn {
-    display: block;
-    margin: 20px auto 0;
-    padding: 10px 18px;
-    background-color: #f3aadb;
-    border: none;
-    color: #87085D;
-    font-weight: bold;
-    font-size: 15px;
-    border-radius: 6px;
-    cursor: pointer;
+    >div.buttons{
 
-    &:hover {
-      background-color: #e97fc3;
-    }
+    display: flex;
+    justify-content: center;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+
+    >button.edit {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 18px;
+        background-color: #f3aadb;
+        border: none;
+        color: #87085D;
+        font-weight: bold;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+        background-color: #e97fc3;
+        }
+  }
+  >button.delete {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 18px;
+        background-color: transparent;
+        border: 1px solid #f3aadb;
+        color: #f3aadb;
+        font-weight: bold;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+        background-color: #e97fc3;
+        }
+  }
   }
 `;
 
@@ -141,15 +166,24 @@ const SpecificQuestionPage = () => {
     return (
         <StyledQuestionPage>
             <h2>{question.questionHeader}</h2>
-            <p className="creator">Created by: {question.creatorUsername} | Date: {question.createDate}</p>
+            <div className="creator">
+                <p>Created by: {question.creatorUsername}</p>
+                <p>Created: {" "}{new Date(question.createDate).toLocaleString()}</p>
+                {
+                    question.lastEdited && (
+                        <p className="creator">Edited on: {new Date(question.lastEdited).toLocaleString()}</p>)
+                }
+            </div>
+
             <p>{question.questionText}</p>
 
             {loggedInUser?._id === question.creatorId && (
-                <>
-                    <button className="edit-btn" onClick={() => navigate(`/edit/${id}`)}>Edit Question</button>
-                    <button className="edit-btn" onClick={handleDelete}>Delete Question</button>
-                </>
+                <div className="buttons">
+                    <button className="edit" onClick={() => navigate(`/edit/${id}`)}>Edit Question</button>
+                    <button className="delete" onClick={handleDelete}>Delete Question</button>
+                </div>
             )}
+
 
             <h3>Answers:</h3>
             {answers.length ?

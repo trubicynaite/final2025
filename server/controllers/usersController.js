@@ -41,7 +41,7 @@ export const loginAuto = async (req, res) => {
         if ("error" in verifyResults) {
             return res.status(401).send(verifyResults);
         }
-        const userId = verifyResults._id;
+        const userId = verifyResults.id;
         if (!ObjectId.isValid(userId)) {
             return res.status(400).send({ error: "Invalid user ID in token." });
         }
