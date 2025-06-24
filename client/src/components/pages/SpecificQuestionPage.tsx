@@ -164,6 +164,33 @@ const SpecificQuestionPage = () => {
         }
     };
 
+    const deleteAnswer = async (answerId: string) => {
+        const confirmed = window.confirm("Are you sure you want to delete this answer?");
+        if (!confirmed) return;
+
+        try {
+            const token = localStorage.getItem("accessJWT");
+
+            const res = await fetch(`http://localhost:5500/answers/${answerId}`, {
+                method: "DELETE",
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+
+            if (res.ok) {
+                alert("Answer deleted successfully.");
+                setAnswers((prev) => prev.filter((a) => a._id !== answerId));
+            } else {
+                const errorData = await res.json();
+                alert(`Failed to delete answer: ${errorData.error}`);
+            }
+        } catch (err) {
+            alert("Something went wrong while deleting the answer.");
+            console.error(err);
+        }
+    };
+
 
     if (loading) return <p>Loading...</p>;
     if (!question) return <p>Question not found.</p>;
@@ -208,13 +235,22 @@ const SpecificQuestionPage = () => {
                                 )}
 
                                 {isCurrentUser && (
-                                    <span
-                                        className="edit-link"
-                                        onClick={() => startEditingAnswer(answer)}
-                                        style={{ cursor: "pointer", marginLeft: "10px", color: "#f3aadb" }}
-                                    >
-                                        Edit
-                                    </span>
+                                    <>
+                                        <span
+                                            className="edit-link"
+                                            onClick={() => startEditingAnswer(answer)}
+                                            style={{ cursor: "pointer", marginLeft: "10px", color: "#f3aadb" }}
+                                        >
+                                            Edit
+                                        </span>
+                                        <button
+                                            className="delete"
+                                            style={{ cursor: "pointer", marginLeft: "10px", color: "#f3aadb" }}
+                                            onClick={() => deleteAnswer(answer._id)}
+                                        >
+                                            Delete
+                                        </button>
+                                    </>
                                 )}
                             </p>
                         </div>
