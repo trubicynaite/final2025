@@ -8,12 +8,14 @@ export const addAnswer = async (req, res) => {
         if (!ObjectId.isValid(questionId)) {
             return res.status(400).send({ error: "Invalid question ID." });
         }
+        const user = await client.db('final').collection('users').findOne({ _id: ObjectId.createFromHexString(req.userId) });
 
         const newAnswer = {
             questionId: questionId,
             creatorId: req.userId,
             answerText: req.body.answerText,
-            createDate: new Date().toISOString().split('T')[0]
+            createDate: new Date(),
+            creatorUsername: user.username
         };
 
         const result = await client.db('final').collection('answers').insertOne(newAnswer);
@@ -33,6 +35,7 @@ export const addAnswer = async (req, res) => {
 };
 
 export const editAnswer = async (req, res) => {
+
     const client = await connectDB();
     try {
         const answerId = req.params.id;
@@ -40,7 +43,10 @@ export const editAnswer = async (req, res) => {
             return res.status(400).send({ error: "Invalid answer ID." });
         }
 
-        const updates = { answerText: req.body.answerText };
+        const updates = {
+            answerText: req.body.answerText,
+            lastEdited: new Date()
+        };
 
         const result = await client.db('final').collection('answers').findOneAndUpdate(
             { _id: ObjectId.createFromHexString(answerId) },
@@ -48,7 +54,11 @@ export const editAnswer = async (req, res) => {
             { returnDocument: 'after' }
         );
 
-        res.send(result.value);
+        if (!result) {
+            return res.status(404).json({ error: "Answer not found." });
+        }
+
+        res.status(200).json(result);
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });

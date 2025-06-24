@@ -2,6 +2,7 @@ import { Router } from "express";
 
 import { getQuestions, addQuestion, editQuestion, deleteQuestion, getQuestionById, getAnswersByQuestionId } from "../controllers/questionsController.js";
 import { verifyJWT } from "../middleware/auth.js";
+import { addAnswer } from "../controllers/answersController.js";
 
 const router = Router();
 
@@ -22,5 +23,8 @@ router.delete('/:id', verifyJWT, deleteQuestion);
 
 // answers - get all answers by question ID
 router.get('/:id/answers', getAnswersByQuestionId);
+
+// add an answer - add a new answer to a specific question by question ID
+router.post('/:id/answers', verifyJWT, addAnswer);
 
 export default router;

@@ -82,6 +82,8 @@ const SpecificQuestionPage = () => {
     const [editAnswer, setEditAnswer] = useState<Answer | null>(null);
     const [editText, setEditText] = useState('');
     const [save, setSave] = useState(false);
+    const [answerText, setAnswerText] = useState("");
+    const [answerForm, setAnswerForm] = useState(false);
 
     const navigate = useNavigate();
 
@@ -113,7 +115,10 @@ const SpecificQuestionPage = () => {
         try {
             const res = await fetch(`http://localhost:5500/answers/${editAnswer._id}`, {
                 method: "PATCH",
-                headers: { "Content-Type": "application/json" },
+                headers: {
+                    "Content-Type": "application/json",
+                    "Authorization": `Bearer ${localStorage.getItem("accessJWT")}`,
+                },
                 body: JSON.stringify({ answerText: editText }),
             });
 
@@ -175,6 +180,7 @@ const SpecificQuestionPage = () => {
                 }
             </div>
 
+
             <p>{question.questionText}</p>
 
             {loggedInUser?._id === question.creatorId && (
@@ -184,27 +190,83 @@ const SpecificQuestionPage = () => {
                 </div>
             )}
 
-
             <h3>Answers:</h3>
-            {answers.length ?
-                answers.map((answer) => (
-                    <div key={answer._id} className="answer">
-                        <p>{answer.answerText}</p>
-                        <p className="creator">
-                            By user ID: {answer.creatorUsername} on {answer.createDate}
-                            {loggedInUser?._id === answer.creatorId && (
-                                <span
-                                    className="edit-link"
-                                    onClick={() => startEditingAnswer(answer)}
-                                >
-                                    Edit
-                                </span>
-                            )}
-                        </p>
-                    </div>
-                )) :
+            {question && answers.length ?
+                answers.map((answer) => {
+                    const isAuthor = answer.creatorId === question.creatorId;
+                    const isCurrentUser = loggedInUser?._id === answer.creatorId;
+                    return (
+                        <div key={answer._id} className="answer">
+                            <p>{answer.answerText}</p>
+                            <p className="creator">
+                                By user: {answer.creatorUsername}
+                                {isAuthor && <strong style={{ marginLeft: "10px", color: "#EB88CA" }}> (answered by author)</strong>}
+                                {" on "}{new Date(answer.createDate).toLocaleString()}
+
+                                {answer.lastEdited && (
+                                    <span> (edited on {new Date(answer.lastEdited).toLocaleString()})</span>
+                                )}
+
+                                {isCurrentUser && (
+                                    <span
+                                        className="edit-link"
+                                        onClick={() => startEditingAnswer(answer)}
+                                        style={{ cursor: "pointer", marginLeft: "10px", color: "#f3aadb" }}
+                                    >
+                                        Edit
+                                    </span>
+                                )}
+                            </p>
+                        </div>
+                    );
+                }) :
                 <p>No answers yet.</p>
             }
+
+            {loggedInUser && (
+                <>
+                    {!answerForm ? (
+                        <button className="edit" onClick={() => setAnswerForm(true)}>
+                            Answer question
+                        </button>
+                    ) : (
+                        <form
+                            onSubmit={async (e) => {
+                                e.preventDefault();
+                                try {
+                                    const token = localStorage.getItem("accessJWT");
+                                    const res = await fetch(`http://localhost:5500/questions/${id}/answers`, {
+                                        method: "POST",
+                                        headers: {
+                                            "Content-Type": "application/json",
+                                            Authorization: `Bearer ${token}`,
+                                        },
+                                        body: JSON.stringify({ answerText: answerText }),
+                                    });
+                                    const { answer: createdAnswer } = await res.json();
+                                    setAnswers((prev) => [...prev, createdAnswer]);
+                                    setAnswerText("");
+                                    setAnswerForm(false);
+                                } catch (err) {
+                                    console.error("Failed to post answer", err);
+                                    alert("Could not post answer.");
+                                }
+                            }}
+                        >
+                            <textarea
+                                value={answerText}
+                                onChange={(e) => setAnswerText(e.target.value)}
+                                rows={4}
+                                placeholder="Write your answer here..."
+                            />
+                            <button type="submit">Publish Answer</button>
+                            <button type="button" onClick={() => setAnswerForm(false)}>
+                                Cancel
+                            </button>
+                        </form>
+                    )}
+                </>
+            )}
 
             {editAnswer && (
                 <form
