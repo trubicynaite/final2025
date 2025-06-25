@@ -31,9 +31,9 @@ const Footer = () => {
     return (
         <StyledFooter>
             <p>&copy; TYPE26 Final Project.</p>
-            <a href="/privacy-policy">Privacy Policy</a>
-            <a href="/terms-of-service">Terms of Service</a>
-            <a href="/contact">Contact Us</a>
+            <a href="/">Privacy Policy</a>
+            <a href="/">Terms of Service</a>
+            <a href="/">Contact Us</a>
         </StyledFooter>
     );
 }

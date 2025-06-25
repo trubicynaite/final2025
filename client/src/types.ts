@@ -95,7 +95,7 @@ export type Answer = {
     lastEdited: string
 };
 
-export type ConfirmModal = {
+export type ConfirmModalType = {
     isOpen: boolean;
     title?: string;
     message: string;
