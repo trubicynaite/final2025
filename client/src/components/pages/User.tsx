@@ -13,6 +13,7 @@ const StyledSection = styled.section`
 
   >h2 {
     margin-bottom: 20px;
+    text-align: center;
   }
 
   label {

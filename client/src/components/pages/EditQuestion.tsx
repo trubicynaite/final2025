@@ -158,12 +158,10 @@ const EditQuestion = () => {
             }
 
             const updatedQuestion = await res.json();
-
             editQuestion(updatedQuestion);
 
             navigate(`/questions/${id}`);
         } catch (err) {
-            alert("Could not load the question.");
             console.error(err);
         }
     };

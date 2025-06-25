@@ -181,7 +181,10 @@ const Register = () => {
                         return;
                     }
 
-                    const { userData } = await response.json();
+                    const { userData, accessJWT } = await response.json();
+                    if (accessJWT) {
+                        localStorage.setItem("accessJWT", accessJWT);
+                    }
 
                     setLoggedInUser(userData);
                     dispatch({

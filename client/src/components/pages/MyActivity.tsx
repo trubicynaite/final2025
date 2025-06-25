@@ -10,10 +10,10 @@ const StyledSection = styled.section`
   max-width: 1200px;
   margin: 0 auto;
   color: white;
+  text-align: center;
 
   > h2 {
     margin-bottom: 20px;
-    color: #f3aadb;
   }
 
   > div.questions {
