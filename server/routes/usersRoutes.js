@@ -15,6 +15,6 @@ router.get('/loginAuto', loginAuto);
 router.post('/register', register);
 
 // edit - edit user
-router.patch('/edit', verifyJWT, editUser);
+router.patch('/me', verifyJWT, editUser);
 
 export default router;
