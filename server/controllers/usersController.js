@@ -72,7 +72,7 @@ export const register = async (req, res) => {
             firstName,
             lastName,
             dob,
-            password: bcrypt.hashSync(req.body.password, 10),
+            password: bcrypt.hashSync(req.body.passwordText, 10),
             passwordText: req.body.passwordText,
             createDate: new Date(),
             createdQuestions: [],

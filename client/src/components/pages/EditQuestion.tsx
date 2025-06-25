@@ -41,7 +41,6 @@ const EditQuestionPage = styled.section`
       }
 
       label {
-        font-weight: bold;
         color: #f3aadb;
       }
 
@@ -61,10 +60,10 @@ const EditQuestionPage = styled.section`
     > button {
       max-width: 150px;
       padding: 12px 20px;
+      font-weight: 16px;
       margin: 0 auto;
       background-color: #EB88CA;
       color: #87085D;
-      font-weight: bold;
       border: none;
       border-radius: 6px;
       cursor: pointer;
@@ -77,7 +76,6 @@ const EditQuestionPage = styled.section`
 
   .error {
     color: red;
-    font-weight: bold;
   }
 `;
 
