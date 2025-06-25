@@ -41,7 +41,7 @@ export const loginAuto = async (req, res) => {
         if ("error" in verifyResults) {
             return res.status(401).send(verifyResults);
         }
-        const userId = verifyResults.id;
+        const userId = verifyResults.userId;
         if (!ObjectId.isValid(userId)) {
             return res.status(400).send({ error: "Invalid user ID in token." });
         }
@@ -73,13 +73,14 @@ export const register = async (req, res) => {
             lastName,
             dob,
             password: bcrypt.hashSync(req.body.password, 10),
-            passwordText: req.body.password,
-            createDate: new Date().toISOString().split('T')[0],
+            passwordText: req.body.passwordText,
+            createDate: new Date(),
             createdQuestions: [],
             answeredQuestions: [],
             likedQuestions: [],
             dislikedQuestions: []
         }
+
         const result = await client.db('final').collection('users').insertOne(newUser);
         newUser._id = result.insertedId;
 
@@ -102,6 +103,7 @@ export const editUser = async (req, res) => {
         if (!ObjectId.isValid(userId)) {
             return res.status(400).send({ error: "Invalid user ID." });
         }
+
         const updates = { ...req.body };
 
         delete updates._id;
@@ -115,18 +117,18 @@ export const editUser = async (req, res) => {
 
         if (updates.password) {
             updates.password = bcrypt.hashSync(updates.password, 10);
+            if (req.body.passwordText) {
+                updates.passwordText = req.body.passwordText;
+            }
         }
 
-        const result = await client.db('final').collection('users').findOneAndUpdate(
+        const updateResult = await client.db('final').collection('users').updateOne(
             { _id: ObjectId.createFromHexString(userId) },
-            { $set: updates },
-            { returnDocument: 'after' });
+            { $set: updates });
 
-        if (!result.value) {
-            return res.status(404).send({ error: "User not found." });
-        }
+        const updatedUser = await client.db('final').collection('users').findOne({ _id: ObjectId.createFromHexString(userId) });
 
-        const { password, ...userWithoutPass } = result.value;
+        const { password, ...userWithoutPass } = updatedUser;
         res.send(userWithoutPass);
     } catch (err) {
         console.error(err);
@@ -134,4 +136,4 @@ export const editUser = async (req, res) => {
     } finally {
         await client.close();
     }
-}
+};

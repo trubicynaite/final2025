@@ -153,11 +153,26 @@ export const deleteQuestion = async (req, res) => {
 
         const result = await client.db('final').collection('questions').deleteOne({ _id: ObjectId.createFromHexString(questionId) });
 
-        if (result.deletedCount) {
-            res.send({ success: `Question with ID ${questionId} was deleted successfully.` });
-        } else {
-            res.status(404).send({ error: `Failed to delete. No question with ID ${questionId}.` })
-        }
+        await client.db('final').collection('answers').deleteMany({ questionId: questionId });
+
+        await client.db('final').collection('users').updateMany(
+            { createdQuestions: questionId },
+            { $pull: { createdQuestions: questionId } }
+        );
+        await client.db('final').collection('users').updateMany(
+            { answeredQuestions: questionId },
+            { $pull: { answeredQuestions: questionId } }
+        );
+        await client.db('final').collection('users').updateMany(
+            { likedQuestions: questionId },
+            { $pull: { likedQuestions: questionId } }
+        );
+        await client.db('final').collection('users').updateMany(
+            { dislikedQuestions: questionId },
+            { $pull: { dislikedQuestions: questionId } }
+        );
+
+        res.send({ success: `Question and its answers with ID ${questionId} were deleted successfully.` });
     } catch (err) {
         console.log(err);
         res.status(500).send({ error: err, message: `Something went wrong, please try again later.` });
