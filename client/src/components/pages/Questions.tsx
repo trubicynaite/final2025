@@ -12,7 +12,6 @@ const StyledQuestions = styled.section`
     min-height: calc(100vh - 80px - 80px);
     
     >h2{
-    color: #EB88CA;
     font-size: 28px;
     margin-top: 10px;
     }

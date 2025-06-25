@@ -94,3 +94,11 @@ export type Answer = {
     creatorUsername: string,
     lastEdited: string
 };
+
+export type ConfirmModal = {
+    isOpen: boolean;
+    title?: string;
+    message: string;
+    onConfirm: () => void;
+    onCancel: () => void;
+};

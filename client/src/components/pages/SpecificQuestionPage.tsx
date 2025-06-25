@@ -4,9 +4,10 @@ import { useContext, useEffect, useState } from "react";
 
 import { Question, UserContextTypes, Answer } from "../../types";
 import UsersContext from "../../contexts/UsersContext";
+import ConfirmModal from "../UI/atoms/ConfirmationModal";
 
 const StyledQuestionPage = styled.section`
-    max-width: 700px;
+    max-width: 100%;
     margin: 40px auto;
     padding: 20px;
 
@@ -134,7 +135,7 @@ button.edit {
 
   >textarea {
     width: 100%;
-    min-height: 150px;
+    min-height: 100px;
     padding: 10px;
     font-size: 15px;
     border-radius: 6px;
@@ -183,72 +184,78 @@ button.edit {
   }
 }
 
-.editAnswerForm {
+>form.edit-answer-form {
+  max-width: 100%;
+  margin-top: 20px;
+  display: flex;
+  flex-direction: column;
+
+  >textarea {
+    width: 100%;
+    min-height: 150px;
     background-color: transparent;
+    padding: 10px;
+    font-size: 15px;
+    border-radius: 6px;
     border: 1px solid #f3aadb;
-    border-radius: 8px;
-    padding: 15px;
-    margin-bottom: 15px;
+    resize: vertical;
 
-    textarea {
-      width: 100%;
-      min-height: 200px;
-      padding: 10px;
+    &:focus {
+      outline: none;
+      border-color: #eb88ca;
+      box-shadow: 0 0 5px #eb88ca;
+    }
+  }
+
+  >div.formBtn {
+    margin-top: 10px;
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+
+    >button {
+      background-color: #f3aadb;
+      border: none;
+      color: #87085d;
       font-size: 15px;
+      padding: 8px 16px;
       border-radius: 6px;
-      resize: vertical;
-      margin-bottom: 10px;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
 
-      &:focus {
-        outline: none;
-        border-color: #eb88ca;
+      &:hover {
+        background-color: #e97fc3;
       }
     }
 
-    .formBtn {
-      display: flex;
-      gap: 10px;
-      justify-content: flex-end;
+    >button[type="button"] {
+      background-color: transparent;
+      border: 1px solid #f3aadb;
+      color: #f3aadb;
 
-      button {
-        padding: 8px 16px;
-        font-size: 15px;
-        border-radius: 6px;
-        cursor: pointer;
-        transition: background-color 0.3s ease;
-      }
-
-      button[type="submit"] {
-        background-color: #f3aadb;
-        border: none;
+      &:hover {
+        background-color: #e97fc3;
         color: #87085d;
       }
-
-      button[type="button"] {
-        background-color: transparent;
-        border: 1px solid #f3aadb;
-        color: #f3aadb;
-
-        &:hover {
-          background-color: #e97fc3;
-          color: #87085d;
-        }
-      }
     }
   }
+}
 
-  @media (min-width: 575px) {
-    max-width: 1000px;
-    padding: 20px;
+@media (min-width: 575px) {
+  max-width: 1000px;
+  margin: 0 auto;
 
-    > h2 {
-      font-size: 28px;
-    }
-
-    .editAnswerForm textarea {
-      min-height: 220px;
-    }
+  > form,
+  > form.edit-answer-form,
+  > textarea,
+  > div.answer {
+    max-width: 100%;
   }
+
+  > textarea {
+    min-height: 150px;
+  }
+}
 `;
 
 const SpecificQuestionPage = () => {
@@ -262,6 +269,8 @@ const SpecificQuestionPage = () => {
     const [save, setSave] = useState(false);
     const [answerText, setAnswerText] = useState("");
     const [answerForm, setAnswerForm] = useState(false);
+    const [modalOpen, setModalOpen] = useState(false);
+    const [deleteTarget, setDeleteTarget] = useState<{ type: "question" | "answer"; id?: string } | null>(null);
 
     const navigate = useNavigate();
 
@@ -294,8 +303,6 @@ const SpecificQuestionPage = () => {
         fetchData();
     }, [id]);
 
-
-
     const startEditingAnswer = (answer: Answer) => {
         setEditAnswer(answer);
         setEditText(answer.answerText);
@@ -323,64 +330,67 @@ const SpecificQuestionPage = () => {
             setEditText("");
         } catch (err) {
             console.error("Error saving answer:", err);
-            alert("Could not save answer.");
         } finally {
             setSave(false);
         }
     };
 
-    const handleDelete = async () => {
-        const confirmed = window.confirm("Are you sure you want to delete this question?");
-        if (!confirmed) return;
-
-        try {
-            const token = localStorage.getItem("accessJWT");
-
-            const res = await fetch(`http://localhost:5500/questions/${id}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`
-                }
-            });
-
-            if (res.ok) {
-                alert("Question deleted successfully.");
-                navigate("/questions", { state: { refresh: true } });
-            } else {
-                const errorData = await res.json();
-                alert(`Failed to delete question: ${errorData.error}`);
-            }
-        } catch (err) {
-            alert("Something went wrong while deleting the question.");
-            console.error(err);
-        }
+    const confirmDeleteQuestion = () => {
+        setDeleteTarget({ type: "question" });
+        setModalOpen(true);
     };
 
-    const deleteAnswer = async (answerId: string) => {
-        const confirmed = window.confirm("Are you sure you want to delete this answer?");
-        if (!confirmed) return;
+    const confirmDeleteAnswer = (answerId: string) => {
+        setDeleteTarget({ type: "answer", id: answerId });
+        setModalOpen(true);
+    };
 
-        try {
-            const token = localStorage.getItem("accessJWT");
+    const handleConfirm = async () => {
+        if (!deleteTarget) return;
 
-            const res = await fetch(`http://localhost:5500/answers/${answerId}`, {
-                method: "DELETE",
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
-
-            if (res.ok) {
-                alert("Answer deleted successfully.");
-                setAnswers((prev) => prev.filter((a) => a._id !== answerId));
-            } else {
-                const errorData = await res.json();
-                alert(`Failed to delete answer: ${errorData.error}`);
+        if (deleteTarget.type === "question") {
+            try {
+                const token = localStorage.getItem("accessJWT");
+                const res = await fetch(`http://localhost:5500/questions/${id}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (res.ok) {
+                    navigate("/questions", { state: { refresh: true } });
+                } else {
+                    const errorData = await res.json();
+                    alert(`Failed to delete question: ${errorData.error}`);
+                }
+            } catch (err) {
+                console.error(err);
             }
-        } catch (err) {
-            alert("Something went wrong while deleting the answer.");
-            console.error(err);
         }
+        if (deleteTarget.type === "answer" && deleteTarget.id) {
+            try {
+                const token = localStorage.getItem("accessJWT");
+                const res = await fetch(`http://localhost:5500/answers/${deleteTarget.id}`, {
+                    method: "DELETE",
+                    headers: { Authorization: `Bearer ${token}` },
+                });
+                if (res.ok) {
+                    alert("Answer deleted successfully.");
+                    setAnswers((prev) => prev.filter((a) => a._id !== deleteTarget.id));
+                } else {
+                    const errorData = await res.json();
+                    alert(`Failed to delete answer: ${errorData.error}`);
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        setModalOpen(false);
+        setDeleteTarget(null);
+    };
+
+    const handleCancel = () => {
+        setModalOpen(false);
+        setDeleteTarget(null);
     };
 
     if (loading) return <p>Loading...</p>;
@@ -401,7 +411,7 @@ const SpecificQuestionPage = () => {
             {loggedInUser?._id === question.creatorId && (
                 <div className="buttons">
                     <button className="edit" onClick={() => navigate(`/edit/${id}`)}>Edit Question</button>
-                    <button className="delete" onClick={handleDelete}>Delete Question</button>
+                    <button className="delete" onClick={confirmDeleteQuestion}>Delete Question</button>
                 </div>
             )}
             <h3>Answers:</h3>
@@ -434,7 +444,7 @@ const SpecificQuestionPage = () => {
                                         <button
                                             className="delete"
                                             style={{ cursor: "pointer", marginLeft: "10px", color: "#f3aadb" }}
-                                            onClick={() => deleteAnswer(answer._id)}
+                                            onClick={() => confirmDeleteAnswer(answer._id)}
                                         >
                                             Delete
                                         </button>
@@ -442,17 +452,14 @@ const SpecificQuestionPage = () => {
                                 )}
                             </p>
                             <p>{answer.answerText}</p>
-
-                            <p style={{ fontSize: "12px", color: "#aaa", marginTop: "4px" }}>
-                                Posted on: {new Date(answer.createDate).toLocaleString()}
+                            <p className="creator" style={{ fontSize: '13px', color: '#b673aa', marginTop: '5px' }}>
+                                Created at: {new Date(answer.createDate).toLocaleString()}
                                 {answer.lastEdited && (
-                                    <>
-                                        {" | "}Edited on: {new Date(answer.lastEdited).toLocaleString()}
-                                    </>
+                                    <> | Edited at: {new Date(answer.lastEdited).toLocaleString()}</>
                                 )}
                             </p>
-
                         </div>
+
                     );
                 }) :
                 <p>No answers yet.</p>
@@ -489,19 +496,6 @@ const SpecificQuestionPage = () => {
                             setAnswers((prev) => [...prev, createdAnswer]);
                             setAnswerText("");
                             setAnswerForm(false);
-
-                            if (token) {
-                                const refreshRes = await fetch("http://localhost:5500/users/loginAuto", {
-                                    method: "GET",
-                                    headers: {
-                                        Authorization: `Bearer ${token}`,
-                                    },
-                                });
-                                if (refreshRes.ok) {
-                                    const { userData } = await refreshRes.json();
-                                    localStorage.setItem("loggedInUser", JSON.stringify(userData));
-                                }
-                            }
                         } catch (err) {
                             console.error("Failed to post answer", err);
                             alert("Could not post answer.");
@@ -523,32 +517,39 @@ const SpecificQuestionPage = () => {
                 </form>
             )}
 
-            {
-                editAnswer && (
-                    <form
-                        className="editAnswerForm"
-                        onSubmit={(e) => {
-                            e.preventDefault();
-                            saveAnswer();
-                        }}
-                    >
-                        <textarea
-                            value={editText}
-                            onChange={(e) => setEditText(e.target.value)}
-                        />
-                        <div className="formBtn">
-                            <button type="submit" disabled={save}>
-                                {save ? "Saving..." : "Save"}
-                            </button>
-                            <button type="button" onClick={() => setEditAnswer(null)}>
-                                Cancel
-                            </button>
-                        </div>
-                    </form>
-                )
-            }
+            {editAnswer && (
+                <form
+                    className="edit-answer-form"
+                    onSubmit={(e) => {
+                        e.preventDefault();
+                        saveAnswer();
+                    }}
+                >
+                    <textarea
+                        value={editText}
+                        onChange={(e) => setEditText(e.target.value)}
+                        placeholder="Edit your answer here..."
+                        rows={4}
+                    />
+                    <div className="formBtn">
+                        <button type="submit" disabled={save}>
+                            {save ? "Saving..." : "Save"}
+                        </button>
+                        <button type="button" onClick={() => setEditAnswer(null)}>
+                            Cancel
+                        </button>
+                    </div>
+                </form>
+            )}
 
 
+            <ConfirmModal
+                isOpen={modalOpen}
+                title="Confirm Delete"
+                message={`Are you sure you want to delete this ${deleteTarget?.type}?`}
+                onConfirm={handleConfirm}
+                onCancel={handleCancel}
+            />
         </StyledQuestionPage>
     );
 }
