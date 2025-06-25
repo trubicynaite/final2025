@@ -86,6 +86,7 @@ const MyActivity = () => {
     const [dislikedQuestions, setDislikedQuestions] = useState<Question[]>([]);
     const [askedQuestions, setAskedQuestions] = useState<Question[]>([]);
     const [answeredQuestions, setAnsweredQuestions] = useState<Question[]>([]);
+    const [loading, setLoading] = useState(true);
 
     useEffect(() => {
         if (!loggedInUser) return;
@@ -113,6 +114,7 @@ const MyActivity = () => {
             setDislikedQuestions(disliked);
             setAskedQuestions(asked);
             setAnsweredQuestions(answered);
+            setLoading(false);
         };
 
         loadData();
@@ -121,64 +123,68 @@ const MyActivity = () => {
     return (
         <StyledSection>
             <h2>My Activity</h2>
-            <div className="questions">
-                <div className="card">
-                    <h3>Asked Questions</h3>
-                    <ul>
-                        {askedQuestions.length > 0 ? (
-                            askedQuestions.map((q) => (
-                                <li key={q._id}>
-                                    <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
-                                </li>
-                            ))
-                        ) : (
-                            <li className="noQ">No questions asked yet.</li>
-                        )}
-                    </ul>
-                </div>
-                <div className="card">
-                    <h3>Answered Questions</h3>
-                    <ul>
-                        {answeredQuestions.length > 0 ? (
-                            answeredQuestions.map((q) => (
-                                <li key={q._id}>
-                                    <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
-                                </li>
-                            ))
-                        ) : (
-                            <li className="noQ">No questions answered yet.</li>
-                        )}
-                    </ul>
-                </div>
-                <div className="card">
-                    <h3>Liked Questions</h3>
-                    <ul>
-                        {likedQuestions.length > 0 ? (
-                            likedQuestions.map((q) => (
-                                <li key={q._id}>
-                                    <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
-                                </li>
-                            ))
-                        ) : (
-                            <li className="noQ">No liked questions yet.</li>
-                        )}
-                    </ul>
-                </div>
-                <div className="card">
-                    <h3>Disliked Questions</h3>
-                    <ul>
-                        {dislikedQuestions.length > 0 ? (
-                            dislikedQuestions.map((q) => (
-                                <li key={q._id}>
-                                    <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
-                                </li>
-                            ))
-                        ) : (
-                            <li className="noQ">No disliked questions yet.</li>
-                        )}
-                    </ul>
-                </div>
-            </div>
+            {
+                loading ?
+                    <p>Loading, please wait.</p> :
+                    <div className="questions">
+                        <div className="card">
+                            <h3>Asked Questions</h3>
+                            <ul>
+                                {askedQuestions.length > 0 ? (
+                                    askedQuestions.map((q) => (
+                                        <li key={q._id}>
+                                            <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className="noQ">No questions asked yet.</li>
+                                )}
+                            </ul>
+                        </div>
+                        <div className="card">
+                            <h3>Answered Questions</h3>
+                            <ul>
+                                {answeredQuestions.length > 0 ? (
+                                    answeredQuestions.map((q) => (
+                                        <li key={q._id}>
+                                            <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className="noQ">No questions answered yet.</li>
+                                )}
+                            </ul>
+                        </div>
+                        <div className="card">
+                            <h3>Liked Questions</h3>
+                            <ul>
+                                {likedQuestions.length > 0 ? (
+                                    likedQuestions.map((q) => (
+                                        <li key={q._id}>
+                                            <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className="noQ">No liked questions yet.</li>
+                                )}
+                            </ul>
+                        </div>
+                        <div className="card">
+                            <h3>Disliked Questions</h3>
+                            <ul>
+                                {dislikedQuestions.length > 0 ? (
+                                    dislikedQuestions.map((q) => (
+                                        <li key={q._id}>
+                                            <Link to={`/questions/${q._id}`}>{q.questionHeader}</Link>
+                                        </li>
+                                    ))
+                                ) : (
+                                    <li className="noQ">No disliked questions yet.</li>
+                                )}
+                            </ul>
+                        </div>
+                    </div>
+            }
         </StyledSection>
     );
 };

@@ -140,7 +140,7 @@ const Header = () => {
                     <ul>
                         <li><NavLink to="/questions">Questions</NavLink></li>
                         <li><NavLink to="/myActivity">My Activity</NavLink></li>
-                        <li><NavLink to="/user">My info</NavLink></li>
+                        <li><NavLink to="/user">Me: {loggedInUser.firstName}</NavLink></li>
                         <li><a onClick={handleLogout} className="logout">Logout</a></li>
                     </ul>
                 </nav> :

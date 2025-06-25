@@ -248,9 +248,9 @@ const QuestionCard = ({ data }: Props) => {
 
                 <div className="actions">
                     {loggedInUser?._id === data.creatorId && (
-                        <button onClick={handleEdit}>Edit question</button>
+                        <button onClick={handleEdit}>Edit Question</button>
                     )}
-                    <button onClick={handleViewAnswers}>View Answers</button>
+                    <button onClick={handleViewAnswers}>View Question</button>
                 </div>
             </div>
         </StyledCard >

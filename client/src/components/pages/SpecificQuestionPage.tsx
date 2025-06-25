@@ -38,22 +38,6 @@ const StyledQuestionPage = styled.section`
     flex-wrap: wrap;
     margin-top: 20px;
 
-    >button.edit {
-        display: block;
-        margin: 20px auto 0;
-        padding: 10px 18px;
-        background-color: #f3aadb;
-        border: none;
-        color: #87085D;
-        font-weight: bold;
-        font-size: 15px;
-        border-radius: 6px;
-        cursor: pointer;
-
-        &:hover {
-        background-color: #e97fc3;
-        }
-  }
   >button.delete {
         display: block;
         margin: 20px auto 0;
@@ -70,7 +54,24 @@ const StyledQuestionPage = styled.section`
         background-color: #e97fc3;
         }
   }
+}
+
+button.edit {
+        display: block;
+        margin: 20px auto 0;
+        padding: 10px 18px;
+        background-color: #f3aadb;
+        border: none;
+        color: #87085D;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+
+        &:hover {
+        background-color: #e97fc3;
+        }
   }
+  
   >h3 {
     margin-top: 40px;
     color: #EB88CA;
@@ -206,17 +207,31 @@ const SpecificQuestionPage = () => {
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true);
-            const questionRes = await fetch(`http://localhost:5500/questions/${id}`);
-            const questionData = await questionRes.json();
-            setQuestion(questionData);
+            try {
+                const questionRes = await fetch(`http://localhost:5500/questions/${id}`);
+                const questionData = await questionRes.json();
 
-            const answersRes = await fetch(`http://localhost:5500/questions/${id}/answers`);
-            const answersData = await answersRes.json();
-            setAnswers(answersData);
-            setLoading(false);
+                if (!questionData?._id) {
+                    setQuestion(null);
+                    setAnswers([]);
+                } else {
+                    setQuestion(questionData);
+                    const answersRes = await fetch(`http://localhost:5500/questions/${id}/answers`);
+                    const answersData = await answersRes.json();
+                    setAnswers(answersData);
+                }
+                // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            } catch (error) {
+                setQuestion(null);
+                setAnswers([]);
+            } finally {
+                setLoading(false);
+            }
         };
         fetchData();
     }, [id]);
+
+
 
     const startEditingAnswer = (answer: Answer) => {
         setEditAnswer(answer);
@@ -267,7 +282,7 @@ const SpecificQuestionPage = () => {
 
             if (res.ok) {
                 alert("Question deleted successfully.");
-                navigate("/questions");
+                navigate("/questions", { state: { refresh: true } });
             } else {
                 const errorData = await res.json();
                 alert(`Failed to delete question: ${errorData.error}`);
@@ -371,51 +386,56 @@ const SpecificQuestionPage = () => {
                 <p>No answers yet.</p>
             }
 
-            {loggedInUser && (
-                <>
-                    {!answerForm ? (
-                        <button className="edit" onClick={() => setAnswerForm(true)}>
-                            Answer question
+            {!answerForm ? (
+                <button
+                    className="edit"
+                    onClick={() => {
+                        if (!loggedInUser) {
+                            navigate("/login");
+                        } else {
+                            setAnswerForm(true);
+                        }
+                    }}
+                >
+                    Answer question
+                </button>
+            ) : (
+                <form
+                    onSubmit={async (e) => {
+                        e.preventDefault();
+                        try {
+                            const token = localStorage.getItem("accessJWT");
+                            const res = await fetch(`http://localhost:5500/questions/${id}/answers`, {
+                                method: "POST",
+                                headers: {
+                                    "Content-Type": "application/json",
+                                    Authorization: `Bearer ${token}`,
+                                },
+                                body: JSON.stringify({ answerText: answerText }),
+                            });
+                            const { answer: createdAnswer } = await res.json();
+                            setAnswers((prev) => [...prev, createdAnswer]);
+                            setAnswerText("");
+                            setAnswerForm(false);
+                        } catch (err) {
+                            console.error("Failed to post answer", err);
+                            alert("Could not post answer.");
+                        }
+                    }}
+                >
+                    <textarea
+                        value={answerText}
+                        onChange={(e) => setAnswerText(e.target.value)}
+                        rows={4}
+                        placeholder="Write your answer here..."
+                    />
+                    <div className="formBtn">
+                        <button type="submit">Publish answer</button>
+                        <button type="button" onClick={() => setAnswerForm(false)}>
+                            Cancel
                         </button>
-                    ) : (
-                        <form
-                            onSubmit={async (e) => {
-                                e.preventDefault();
-                                try {
-                                    const token = localStorage.getItem("accessJWT");
-                                    const res = await fetch(`http://localhost:5500/questions/${id}/answers`, {
-                                        method: "POST",
-                                        headers: {
-                                            "Content-Type": "application/json",
-                                            Authorization: `Bearer ${token}`,
-                                        },
-                                        body: JSON.stringify({ answerText: answerText }),
-                                    });
-                                    const { answer: createdAnswer } = await res.json();
-                                    setAnswers((prev) => [...prev, createdAnswer]);
-                                    setAnswerText("");
-                                    setAnswerForm(false);
-                                } catch (err) {
-                                    console.error("Failed to post answer", err);
-                                    alert("Could not post answer.");
-                                }
-                            }}
-                        >
-                            <textarea
-                                value={answerText}
-                                onChange={(e) => setAnswerText(e.target.value)}
-                                rows={4}
-                                placeholder="Write your answer here..."
-                            />
-                            <div className="formBtn">
-                                <button type="submit">Publish answer</button>
-                                <button type="button" onClick={() => setAnswerForm(false)}>
-                                    Cancel
-                                </button>
-                            </div>
-                        </form>
-                    )}
-                </>
+                    </div>
+                </form>
             )}
 
             {editAnswer && (

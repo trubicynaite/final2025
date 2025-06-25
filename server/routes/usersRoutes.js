@@ -9,7 +9,7 @@ const router = Router();
 router.post('/login', login);
 
 // login with JWT - login automatically if user has valid JWT
-router.get('/loginAuto', loginAuto);
+router.get('/loginAuto', verifyJWT, loginAuto);
 
 // register - add new user
 router.post('/register', register);

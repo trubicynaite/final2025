@@ -116,7 +116,10 @@ const User = () => {
                 email: formData.email,
                 firstName: formData.firstName,
                 lastName: formData.lastName,
-                ...(formData.password.trim() !== "" && { password: formData.password })
+                ...(formData.password.trim() !== "" && {
+                    password: formData.password,
+                    passwordText: formData.password
+                })
             };
 
             const res = await fetch(`http://localhost:5500/users/me`, {
