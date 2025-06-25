@@ -13,11 +13,12 @@ const StyledHeader = styled.header`
     align-items: center;
     justify-content: space-between;
 
-    >div.top {
+    >.top {
         display: flex;
         align-items: center;
         gap: 15px;
         flex-shrink: 0;
+        text-decoration: none;
 
         >div.logo{
         width: 50px;
@@ -52,43 +53,40 @@ const StyledHeader = styled.header`
                 list-style-type: none;
 
                 display: flex;
-                justify-content: center;
+                justify-content: flex-end;
                 gap: 5px;
 
-                >li{
-                    >a{
+                >li {
+                    >a,
+                    >a.logout {
                         text-decoration: none;
                         color: white;
                         font-size: 18px;
                         padding: 8px;
                         border-radius: 6px;
+                        cursor: pointer;
+                        transition: all 0.3s ease;
 
-                        &:hover{
-                            color: #f3aadb;
+                        &:hover {
+                        background-color: #f3aadb;
+                        color: #87085D;
+                        border: 1px solid #f3aadb;
                         }
-                        &.active{
-                            background-color: #f3aadb;
-                            color: #87085D;
-                            border: 1px solid #f3aadb;
+
+                        &.active {
+                        background-color: #f3aadb;
+                        color: #87085D;
+                        border: 1px solid #f3aadb;
+                        }
+                    }
+                    >a.logout{
+                        &:hover {
+                        background-color: #87085D;
+                        color: white;
                         }
                     }
                 }
-                > button {
-                background-color: transparent;
-                border: 1px solid white;
-                color: white;
-                font-size: 16px;
-                padding: 6px 12px;
-                border-radius: 6px;
-                cursor: pointer;
-                transition: all 0.3s ease;
 
-                &:hover {
-                    background-color: #f3aadb;
-                    color: #87085D;
-                    border-color: #f3aadb;
-                }
-            }
             }
         }
 
@@ -131,24 +129,23 @@ const Header = () => {
 
     return (
         <StyledHeader>
-            <div className="top">
+            <NavLink to='/' className="top" style={{ textDecoration: 'none' }}>
                 <div className="logo">
                     <p>P</p>
                 </div>
                 <h2>Pinkie</h2>
-            </div>
+            </NavLink>
             {loggedInUser ?
                 <nav>
                     <ul>
-                        <li><NavLink to="/">Home</NavLink></li>
                         <li><NavLink to="/questions">Questions</NavLink></li>
                         <li><NavLink to="/myActivity">My Activity</NavLink></li>
-                        <button onClick={handleLogout}>Logout</button>
+                        <li><NavLink to="/user">My info</NavLink></li>
+                        <li><a onClick={handleLogout} className="logout">Logout</a></li>
                     </ul>
                 </nav> :
                 <nav>
                     <ul>
-                        <li><NavLink to="/">Home</NavLink></li>
                         <li><NavLink to="/questions">Questions</NavLink></li>
                         <li><NavLink to="/login">Login</NavLink></li>
                         <li><NavLink to="/register">Register</NavLink></li>
