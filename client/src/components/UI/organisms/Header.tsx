@@ -143,7 +143,7 @@ const Header = () => {
                     <ul>
                         <li><NavLink to="/questions">Questions</NavLink></li>
                         <li><NavLink to="/myActivity">My Activity</NavLink></li>
-                        <li><NavLink to="/user">{loggedInUser.firstName} | {loggedInUser.username}</NavLink></li>
+                        <li><NavLink to="/user">{loggedInUser.username}</NavLink></li>
                         <li><a onClick={handleLogout} className="logout">Logout</a></li>
                     </ul>
                 </nav> :
