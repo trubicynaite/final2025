@@ -146,6 +146,7 @@ const Questions = () => {
         setCurrentPage(1);
         setLoading(true);
         await fetchFiltered();
+        setLoading(false);
     };
 
     const handleAddNewQ = () => {
