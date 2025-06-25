@@ -104,10 +104,10 @@ const MyActivity = () => {
 
 
         const loadData = async () => {
-            const liked = await fetchQuestionsByIds(loggedInUser.likedQuestions);
-            const disliked = await fetchQuestionsByIds(loggedInUser.dislikedQuestions);
-            const asked = await fetchQuestionsByIds(loggedInUser.createdQuestions);
-            const answered = await fetchQuestionsByIds(loggedInUser.answeredQuestions);
+            const liked = await fetchQuestionsByIds(loggedInUser.likedQuestions || []);
+            const disliked = await fetchQuestionsByIds(loggedInUser.dislikedQuestions || []);
+            const asked = await fetchQuestionsByIds(loggedInUser.createdQuestions || []);
+            const answered = await fetchQuestionsByIds(loggedInUser.answeredQuestions || []);
 
             setLikedQuestions(liked);
             setDislikedQuestions(disliked);

@@ -117,7 +117,8 @@ export const editUser = async (req, res) => {
             updates.password = bcrypt.hashSync(updates.password, 10);
         }
 
-        const result = await client.db('final').collection('users').findOneAndUpdate({ _id: ObjectId.createFromHexString(userId) },
+        const result = await client.db('final').collection('users').findOneAndUpdate(
+            { _id: ObjectId.createFromHexString(userId) },
             { $set: updates },
             { returnDocument: 'after' });
 
