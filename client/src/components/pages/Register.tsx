@@ -1,12 +1,11 @@
 import { useFormik } from "formik";
-import bcrypt from "bcryptjs";
 import { useContext, useState } from "react";
 import { useNavigate, Link } from "react-router";
 import * as Yup from 'yup';
 import styled from "styled-components";
 
 import UsersContext from "../../contexts/UsersContext";
-import { User, UserContextTypes } from "../../types";
+import { UserContextTypes } from "../../types";
 
 const StyledReg = styled.section`
   display: flex;
@@ -159,14 +158,15 @@ const Register = () => {
                 setError('This user already exists.');
                 return;
             } else {
+                localStorage.removeItem('accessJWT');
+                sessionStorage.removeItem('accessJWT');
                 // eslint-disable-next-line @typescript-eslint/no-unused-vars
                 const { passwordRepeat, ...rest } = values;
 
                 const newUser = {
                     ...rest,
                     passwordText: rest.password,
-                    password: bcrypt.hashSync(rest.password, 10),
-                    createDate: new Date().toISOString().split('T')[0]
+                    createDate: new Date()
                 };
                 try {
                     const response = await fetch('http://localhost:5500/users/register', {
@@ -181,12 +181,12 @@ const Register = () => {
                         return;
                     }
 
-                    const createdUser: User = await response.json();
+                    const { userData } = await response.json();
 
-                    setLoggedInUser(createdUser);
+                    setLoggedInUser(userData);
                     dispatch({
                         type: 'addUser',
-                        newUser: createdUser
+                        newUser: userData
                     });
 
                     formik.resetForm();
