@@ -12,9 +12,15 @@ const StyledHome = styled.section`
         margin-top: 50px;
         margin-bottom: 50px;
         display: flex;
+        align-items: center;
+        justify-content: center;
         gap: 30px;
         margin-right: 20px;
         margin-left: 20px;
+
+        >div{
+            max-width: 400px;
+        }
     }
 `
 
