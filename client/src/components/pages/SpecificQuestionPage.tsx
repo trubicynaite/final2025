@@ -98,10 +98,6 @@ button.edit {
       align-items: center;
       gap: 8px;
 
-      >strong {
-        color: #eb88ca;
-      }
-
       >span.edit-link {
         color: #f3aadb;
         cursor: pointer;
@@ -138,7 +134,7 @@ button.edit {
 
   >textarea {
     width: 100%;
-    min-height: 100px;
+    min-height: 150px;
     padding: 10px;
     font-size: 15px;
     border-radius: 6px;
@@ -186,6 +182,73 @@ button.edit {
     }
   }
 }
+
+.editAnswerForm {
+    background-color: transparent;
+    border: 1px solid #f3aadb;
+    border-radius: 8px;
+    padding: 15px;
+    margin-bottom: 15px;
+
+    textarea {
+      width: 100%;
+      min-height: 200px;
+      padding: 10px;
+      font-size: 15px;
+      border-radius: 6px;
+      resize: vertical;
+      margin-bottom: 10px;
+
+      &:focus {
+        outline: none;
+        border-color: #eb88ca;
+      }
+    }
+
+    .formBtn {
+      display: flex;
+      gap: 10px;
+      justify-content: flex-end;
+
+      button {
+        padding: 8px 16px;
+        font-size: 15px;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: background-color 0.3s ease;
+      }
+
+      button[type="submit"] {
+        background-color: #f3aadb;
+        border: none;
+        color: #87085d;
+      }
+
+      button[type="button"] {
+        background-color: transparent;
+        border: 1px solid #f3aadb;
+        color: #f3aadb;
+
+        &:hover {
+          background-color: #e97fc3;
+          color: #87085d;
+        }
+      }
+    }
+  }
+
+  @media (min-width: 575px) {
+    max-width: 1000px;
+    padding: 20px;
+
+    > h2 {
+      font-size: 28px;
+    }
+
+    .editAnswerForm textarea {
+      min-height: 220px;
+    }
+  }
 `;
 
 const SpecificQuestionPage = () => {
@@ -380,6 +443,15 @@ const SpecificQuestionPage = () => {
                             </p>
                             <p>{answer.answerText}</p>
 
+                            <p style={{ fontSize: "12px", color: "#aaa", marginTop: "4px" }}>
+                                Posted on: {new Date(answer.createDate).toLocaleString()}
+                                {answer.lastEdited && (
+                                    <>
+                                        {" | "}Edited on: {new Date(answer.lastEdited).toLocaleString()}
+                                    </>
+                                )}
+                            </p>
+
                         </div>
                     );
                 }) :
@@ -451,25 +523,31 @@ const SpecificQuestionPage = () => {
                 </form>
             )}
 
-            {editAnswer && (
-                <form
-                    onSubmit={(e) => {
-                        e.preventDefault();
-                        saveAnswer();
-                    }}
-                >
-                    <textarea
-                        value={editText}
-                        onChange={(e) => setEditText(e.target.value)}
-                    />
-                    <button type="submit" disabled={save}>
-                        {save ? "Saving..." : "Save"}
-                    </button>
-                    <button type="button" onClick={() => setEditAnswer(null)}>
-                        Cancel
-                    </button>
-                </form>
-            )}
+            {
+                editAnswer && (
+                    <form
+                        className="editAnswerForm"
+                        onSubmit={(e) => {
+                            e.preventDefault();
+                            saveAnswer();
+                        }}
+                    >
+                        <textarea
+                            value={editText}
+                            onChange={(e) => setEditText(e.target.value)}
+                        />
+                        <div className="formBtn">
+                            <button type="submit" disabled={save}>
+                                {save ? "Saving..." : "Save"}
+                            </button>
+                            <button type="button" onClick={() => setEditAnswer(null)}>
+                                Cancel
+                            </button>
+                        </div>
+                    </form>
+                )
+            }
+
 
         </StyledQuestionPage>
     );
