@@ -417,6 +417,19 @@ const SpecificQuestionPage = () => {
                             setAnswers((prev) => [...prev, createdAnswer]);
                             setAnswerText("");
                             setAnswerForm(false);
+
+                            if (token) {
+                                const refreshRes = await fetch("http://localhost:5500/users/loginAuto", {
+                                    method: "GET",
+                                    headers: {
+                                        Authorization: `Bearer ${token}`,
+                                    },
+                                });
+                                if (refreshRes.ok) {
+                                    const { userData } = await refreshRes.json();
+                                    localStorage.setItem("loggedInUser", JSON.stringify(userData));
+                                }
+                            }
                         } catch (err) {
                             console.error("Failed to post answer", err);
                             alert("Could not post answer.");

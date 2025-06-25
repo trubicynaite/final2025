@@ -25,6 +25,11 @@ export const addAnswer = async (req, res) => {
             { $inc: { answerCount: 1 } }
         );
 
+        await client.db('final').collection('users').updateOne(
+            { _id: ObjectId.createFromHexString(req.userId) },
+            { $addToSet: { answeredQuestions: questionId } }
+        );
+
         res.status(201).send({ success: 'Answer added successfully.', answer: { ...newAnswer, _id: result.insertedId } });
     } catch (err) {
         console.log(err);
