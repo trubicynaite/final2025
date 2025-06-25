@@ -9,7 +9,6 @@ const StyledNewQuestion = styled.section`
 
   >h2 {
     text-align: center;
-    color: #eb88ca;
     margin-bottom: 20px;
   }
 
@@ -50,79 +49,79 @@ const StyledNewQuestion = styled.section`
 `;
 
 const NewQuestion = () => {
-    const [questionHeader, setQuestionHeader] = useState("");
-    const [questionText, setQuestionText] = useState("");
-    const [category, setCategory] = useState("face");
+  const [questionHeader, setQuestionHeader] = useState("");
+  const [questionText, setQuestionText] = useState("");
+  const [category, setCategory] = useState("face");
 
-    const navigate = useNavigate();
+  const navigate = useNavigate();
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
 
-        const newQuestion = {
-            questionHeader,
-            questionText,
-            category
-        };
-
-        const token = localStorage.getItem("accessJWT");
-
-        const res = await fetch("http://localhost:5500/questions", {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json",
-                Authorization: `Bearer ${token}`,
-            },
-            body: JSON.stringify(newQuestion),
-        });
-
-        if (res.ok) {
-            const created = await res.json();
-            navigate(`/questions/${created._id}`);
-        } else {
-            alert("Failed to create question.");
-        }
+    const newQuestion = {
+      questionHeader,
+      questionText,
+      category
     };
 
-    return (
-        <StyledNewQuestion>
-            <h2>Ask a New Question</h2>
-            <form onSubmit={handleSubmit}>
-                <label htmlFor="header">Question Title:</label>
-                <input
-                    id="header"
-                    type="text"
-                    value={questionHeader}
-                    onChange={(e) => setQuestionHeader(e.target.value)}
-                    required
-                />
+    const token = localStorage.getItem("accessJWT");
 
-                <label htmlFor="category">Select category:</label>
-                <select
-                    id="category"
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    required
-                >
-                    <option value="face">Face</option>
-                    <option value="eyes">Eyes</option>
-                    <option value="eyebrows">Eyebrows</option>
-                    <option value="lips">Lips</option>
-                </select>
+    const res = await fetch("http://localhost:5500/questions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+      body: JSON.stringify(newQuestion),
+    });
 
-                <label htmlFor="text">Describe your question:</label>
-                <textarea
-                    id="text"
-                    rows={5}
-                    value={questionText}
-                    onChange={(e) => setQuestionText(e.target.value)}
-                    required
-                />
+    if (res.ok) {
+      const created = await res.json();
+      navigate(`/questions/${created._id}`);
+    } else {
+      alert("Failed to create question.");
+    }
+  };
 
-                <button type="submit">Post Question</button>
-            </form>
-        </StyledNewQuestion>
-    );
+  return (
+    <StyledNewQuestion>
+      <h2>Ask a New Question</h2>
+      <form onSubmit={handleSubmit}>
+        <label htmlFor="header">Question Title:</label>
+        <input
+          id="header"
+          type="text"
+          value={questionHeader}
+          onChange={(e) => setQuestionHeader(e.target.value)}
+          required
+        />
+
+        <label htmlFor="category">Select category:</label>
+        <select
+          id="category"
+          value={category}
+          onChange={(e) => setCategory(e.target.value)}
+          required
+        >
+          <option value="face">Face</option>
+          <option value="eyes">Eyes</option>
+          <option value="eyebrows">Eyebrows</option>
+          <option value="lips">Lips</option>
+        </select>
+
+        <label htmlFor="text">Describe your question:</label>
+        <textarea
+          id="text"
+          rows={5}
+          value={questionText}
+          onChange={(e) => setQuestionText(e.target.value)}
+          required
+        />
+
+        <button type="submit">Post Question</button>
+      </form>
+    </StyledNewQuestion>
+  );
 };
 
 export default NewQuestion;

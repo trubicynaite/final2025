@@ -124,8 +124,11 @@ const Header = () => {
     const handleLogout = () => {
         setLoggedInUser(null);
         localStorage.removeItem('loggedInUser');
+        localStorage.removeItem('accessJWT');
+        sessionStorage.removeItem('accessJWT');
         navigate('/');
     };
+
 
     return (
         <StyledHeader>
@@ -140,7 +143,7 @@ const Header = () => {
                     <ul>
                         <li><NavLink to="/questions">Questions</NavLink></li>
                         <li><NavLink to="/myActivity">My Activity</NavLink></li>
-                        <li><NavLink to="/user">Me: {loggedInUser.firstName}</NavLink></li>
+                        <li><NavLink to="/user">{loggedInUser.username}</NavLink></li>
                         <li><a onClick={handleLogout} className="logout">Logout</a></li>
                     </ul>
                 </nav> :
