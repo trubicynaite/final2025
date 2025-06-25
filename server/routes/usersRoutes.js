@@ -9,12 +9,12 @@ const router = Router();
 router.post('/login', login);
 
 // login with JWT - login automatically if user has valid JWT
-router.get('/loginAuto', loginAuto);
+router.get('/loginAuto', verifyJWT, loginAuto);
 
 // register - add new user
 router.post('/register', register);
 
 // edit - edit user
-router.patch('/edit', verifyJWT, editUser);
+router.patch('/me', verifyJWT, editUser);
 
 export default router;

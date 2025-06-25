@@ -1,6 +1,6 @@
-import { useContext, useState } from "react";
+import { useContext, useState, useEffect } from "react";
 import styled from "styled-components";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 
 import QuestionsContext from "../../contexts/QuestionsContext";
 import { QuestionsContextTypes } from "../../types";
@@ -92,8 +92,8 @@ const StyledQuestions = styled.section`
 const Questions = () => {
 
     const { questions, fetchFiltered } = useContext(QuestionsContext) as QuestionsContextTypes;
-
     const navigate = useNavigate();
+    const location = useLocation();
 
     const [title, setTitle] = useState("");
     const [category, setCategory] = useState("");
@@ -153,6 +153,13 @@ const Questions = () => {
         const isLoggedIn = !!localStorage.getItem("accessJWT");
         navigate(isLoggedIn ? "/newQuestion" : "/login");
     };
+
+    useEffect(() => {
+        if (location.state?.refresh) {
+            fetchFiltered();
+            window.history.replaceState({}, document.title);
+        }
+    }, [location.state, fetchFiltered]);
 
     return (
         <StyledQuestions>

@@ -136,8 +136,13 @@ const QuestionCard = ({ data }: Props) => {
 
     const [likeCount, setLikeCount] = useState(data.likeCount);
     const [dislikeCount, setDislikeCount] = useState(data.dislikeCount);
-    const [userLiked, setUserLiked] = useState(loggedInUser?.likedQuestions.includes(data._id));
-    const [userDisliked, setUserDisliked] = useState(loggedInUser?.dislikedQuestions.includes(data._id));
+    const [userLiked, setUserLiked] = useState(
+        (loggedInUser?.likedQuestions ?? []).includes(data._id)
+    );
+    const [userDisliked, setUserDisliked] = useState(
+        (loggedInUser?.dislikedQuestions ?? []).includes(data._id)
+    );
+
 
     const handleReaction = async (reaction: "like" | "dislike") => {
         if (!loggedInUser) return;
@@ -243,9 +248,9 @@ const QuestionCard = ({ data }: Props) => {
 
                 <div className="actions">
                     {loggedInUser?._id === data.creatorId && (
-                        <button onClick={handleEdit}>Edit question</button>
+                        <button onClick={handleEdit}>Edit Question</button>
                     )}
-                    <button onClick={handleViewAnswers}>View Answers</button>
+                    <button onClick={handleViewAnswers}>View Question</button>
                 </div>
             </div>
         </StyledCard >
