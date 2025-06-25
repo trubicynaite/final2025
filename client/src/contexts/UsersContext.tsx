@@ -86,7 +86,7 @@ const UserProvider = ({ children }: ChildrenElementProp) => {
             setLoggedInUser(prev => prev ? { ...prev, ...updatedUser } : null);
         }
 
-        await fetch(`http://localhost:5500/users/${loggedInUser._id}`, {
+        await fetch(`http://localhost:5500/users/me`, {
             method: "PATCH",
             headers: {
                 "Content-Type": "application/json",
